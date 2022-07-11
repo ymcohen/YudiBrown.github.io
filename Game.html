@@ -1,0 +1,3908 @@
+/**
+ ███████╗███████╗ ██████╗ █████╗ ██████╗ ███████╗    ██████╗ ██╗      █████╗ ███╗   ██╗██╗
+ ██╔════╝██╔════╝██╔════╝██╔══██╗██╔══██╗██╔════╝    ██╔══██╗██║     ██╔══██╗████╗  ██║██║
+ █████╗  ███████╗██║     ███████║██████╔╝█████╗      ██████╔╝██║     ███████║██╔██╗ ██║██║
+ ██╔══╝  ╚════██║██║     ██╔══██║██╔═══╝ ██╔══╝      ██╔═══╝ ██║     ██╔══██║██║╚██╗██║╚═╝
+ ███████╗███████║╚██████╗██║  ██║██║     ███████╗    ██║     ███████╗██║  ██║██║ ╚████║██╗
+ ╚══════╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝     ╚══════╝    ╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝
+ 
+ * Thanks so much guys for the encouraging feed-back!                                       *
+ * @CREDITS
+ * Michael da Boss for the crate collision on the blocks (code adapted)
+ * Thomas L. for original collision on blocks! (code adapted)
+ * Tristan R. for level 6! 
+ * Everything else is coded by Jacob ---> www.khanacademy.org/profile/Jacob124/programs
+ * 
+ * @UPDATES:
+ * More sounds,
+ * less lag!
+ * Cool background,
+ * More levels!
+ * More game items.
+ * Level editor!  ---->   https://www.khanacademy.org/cs/p/5718868907655168
+ * ANIMATIONS! (Yes they are all done! go see the story!)
+ * 3900+ lines of code!
+*/
+/* ***************************************************************************************************
+I'm thinking of making a place for users to put their own levels!
+make you own now and give me the code in the T&T and your level might be chosen to be in this game!
+level editor: https://www.khanacademy.org/computer-programming/escape-plan-editor/5718868907655168
+********************************************************************************************************/
+/**TODO:
+ * Add place for users to put their levels!
+ * level editor: https://www.khanacademy.org/computer-programming/escape-plan-editor/5718868907655168
+ **/
+scale(width/400,height/400);
+ var logo;
+var gfx = createGraphics(width, height, P2D);
+if(!logo&&gfx){
+gfx.background(0,0,0,255);
+gfx.fill(255, 255, 255);
+gfx.textSize(128);
+gfx.textFont(createFont("Microsoft JhengHei UI Light"),130);
+gfx.noStroke();
+gfx.fill(4, 0, 255);
+gfx.beginShape();
+for(var i=0;i<360;i+=11+cos(i*10)*4){
+    gfx.vertex(250+cos(i)*150,200+sin(i)*150+cos(i*33)*20);
+    gfx.vertex(250+cos(i)*12+cos(i*15),200+sin(i)*12+cos(i*30));
+}
+gfx.endShape();
+gfx.filter(BLUR);
+gfx.filter(BLUR);
+gfx.filter(BLUR);
+gfx.filter(BLUR);
+gfx.fill(255);
+gfx.beginShape();
+for(var i=0;i<360;i+=11+cos(i*10)*4){
+    gfx.vertex(250+cos(i)*150,200+sin(i)*150+cos(i*33)*20);
+    gfx.vertex(250+cos(i)*10+cos(i*15),200+sin(i)*10+cos(i*30));
+}
+gfx.endShape();
+gfx.filter(BLUR);
+gfx.filter(BLUR);
+var Fill = function(co){
+    return "rgba("+red(co)+","+green(co)+","+blue(co)+","+6+")";
+};//turns color into text
+
+var ctx = gfx.externals.canvas.getContext('2d');
+        ctx.save();
+        ctx.shadowColor =   Fill(color(0, 0, 255));
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.shadowBlur = 20;
+        ctx.fillStyle = '#fff';
+        ctx.fillText("Yud  i", 30,230);
+        ctx.restore();
+
+image(gfx,0,0);
+var logo = get(0,0,400,400);
+}
+var lvl = 0;//keep track of which level to access.
+var levels = [
+    {
+    time: 0,
+    bestTime: 10000,
+    stars: 0,
+    score: 0,
+    lock: false,
+    totalLevelScore: 0,
+    messages: ["Hello!\nWelcome to the spaceship prisoner! I, Yudi, will be your guide for this exciting trip! Start by using the arrow keys to move!",
+        "In each room of the spacecraft, you will find some scattered star-dust. Collect them to gain points!",
+        "Warning!\nThese zappers are extremly dangerous! Get too close and they'll zap you back to the beginning!",
+        "Careful! This space-craft is equipped with maximum level security! This includes lasers and sometimes even robots! Make sure to stay out of their way!",
+        "This is a check-mark.\nIt will automatically save\nyour progress. Go ahead\nand activate it!",
+        "Hmm, This laser seems too long to jump over, I wonder how I could get through it...",
+        "This is the Exit, it will take you to the next room...",
+        "You have finished the tutorial! Good luck my friend,\nnot many creatures have\nsucceeded to Escape..."
+    ],
+    level: [   "                                               ",
+            "P                                   bb         ",
+            "             $$$$                  $bb         ",
+            "            $    $                 $bb         ",
+            "?      ?  $$      $$! ]bbb[        $bb       bb",
+            "bbbbbbbbbbbbb    bbbbbbbbbbbbbb    $bb       bb",
+            "bbbbbbbbbbbbbbbbbbbbb              $bb       bb",
+            "bbbbbbbbbbbbbbbbbbb                $bb       bb",
+            "b                                  $bb       bb",
+            "b    $$$$$            $$$$     !   cbb       bb",
+            "b$   bbbb$$$$         bbbb>   bbbbbbbbbbbbbbbbb",
+            "b$    bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "b$    -     -----     -----    $$           ]bb",
+            "b$                                          ]bb",
+            "b  ?~   ]b        ]b        ]b       ~      ]bb",
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb    ]bb",
+            "b                                           ]bb",
+            "b                                          c]bb",
+            "b  $$$ $$$ $$$ $$$            b_b_b_bb_b____bbb",
+            "b bbbbbbbbbbbbbbbb>  bbbb>   bbbbbbbbbbbbbbbbbb",
+            "b                                 $$$$$       b",
+            "b         c                      bbbbbb       b",
+            "b        bb                    b$$$$$$$       b",
+            "b ~ ? b          <b      ~   b$$$$$$$$$?  ? @ b",
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        ],
+    },{
+        time: 0,
+        bestTime: 1000000,
+        stars: 0,
+        score: 0,
+        totalLevelScore: 0,
+        lock: false,
+        messages: ["WARNING!!!\nRemember the robots I talked to you about? There are 2 in this room. As long as you stay out of their way, you should be fine. Good luck!"],
+        level: [   "                                               ",
+            "                                               ",
+            "        $$$$$$                                 ",
+            "        bbbbbb                                 ",
+            "$$$$$$$               _                        ",
+            "$bbbbbb>              b                        ",
+            "$                                              ",
+            "b                                  ~ $$$$      ",
+            "                                  bbbbbbbb[    ",
+            " b                    $$      b   --     b[    ",
+            "                      bb   ]b          @ b[    ",
+            "b                $  b $$             bbbbb[    ",
+            "$$$$$           bb     bb        bbb b ---     ",
+            "bbbbb        c     $$$     ]bb       c$$$$$$   ",
+            "$$$        bbbb    bbb     ]b        bbbbbbbbbb",
+            "bbb    bb                bb]b> $$$$$  b        ",
+            "  P  $$$$$$ !       $$$    ]bbbbbbbb           ",
+            "bbbbbbbbbbbbbbr    bbbbb   ]b $$$$$$$$$$$$$$$$$",
+            "b> $$$$$$$$$$   $$$$        h     $$$$$$$$$$$$b",
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        ]
+    },{
+        time: 0,
+        bestTime: 10000,
+        stars: 0,
+        score: 0,
+        lock: false,
+        totalLevelScore: 0,
+        messages: ["Woah, That's a lot of robots, I wonder if that crate could be of any use?",
+        "Remember, if you ever get stuck on a level, Press 'r' to restart",
+        "Be carful with those crates, one wrong move could ruin your level's progress",
+        "Still have that crate from earlier? Now would be a good\ntime you use it!",
+        "Remember that extra crate up there? You DO have it right?",
+        "Wow, your getting the hang of this. Keep it up and you might actually have a chance to Escape!"],   
+        level: [
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "bbbbbbbbb           bb  bb                           bbbb",
+        "b         r         bb  bb                           bbbb",
+        "bP                  bb  bb        c^b  c ^  c ^~ c   bbbb",
+        "b    c  ?   rbbbbbbbbbbbbb        bbbbbbbbbbbbbbbbbb bbbb",
+        "bbbbbbbbbb   bbbbbbbbbb$$$$?$$!    ---------------bb bbbb",
+        "bbbbbbbbbb   bbbbbbbbbbbbbbbbbbb                  bb bbbb",
+        "bbbbbbbbbb   bbbb                 bb              bb bbbb",
+        "b$$$$$bbbb  Rbbbb                 --              bb bbbb",
+        "bb$$$$$bb     bbb              bb                 bb bbbb",
+        "b         R   333  ?           --                 bb  bbb",
+        "bbbb  bbbbbbbbbbbbbbb>     ~       bbbbbbbbbbbbbbbbb   ]b",
+        "b       bbbbbbbbbbbbbbbbbbbbbbbbbbbbb             bb   ]b",
+        "b       bbbbbbb     bbbbbbbbbbbbb  ?                   ]b",
+        "b       bbbbbbb$    bbbbbbbbbbb   bbbbbbbbbbbbbbbbbbbbbbb",
+        "b       bbbbbbb$$    ---------                          b",
+        "b_______b$$$$$$$$$               ^b      $$$$$$$$  ?  @ b",
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        ]
+    },{
+        time: 0,
+        bestTime: 10000,
+        stars: 0,
+        score: 0,
+        lock: false,
+        totalLevelScore: 0,
+        messages: [],
+        level: [
+        "bbbbbbbbbbbbbbbbbbbbbbbbb",
+        "bbbbbbbbbbbbb        bbbb",
+        "b$$$             r    4  ",
+        "b$$$       $$     ~      ",
+        "b$$$ c     bb$    bb     ",
+        "bbbbbbbbbb  bbr$$ b    b ",
+        "bbbbbbbbbb  bbbbbbb      ",
+        "bbbbbbbbbb  b       b    ",
+        "b                        ",
+        "b P                    b ",
+        "b     $$$$  $        3  3",
+        "bbbbbbbbbb  b     $bbbbbb",
+        "         b>       $b     ",
+        "    c    bbbbbbb  $b     ",
+        "    b             $b $$@ ",
+        "       $          $b$  bb",
+        "       b          $b$   b",
+        "  33^33^  $ $ $$~  bb   b",
+        "  bbbbbbbbbbbbbbbbbb   cb ",
+        "                       cb",
+        ">       c $$ $$ $$     cb",
+        "bbbbbbbbbbbbbbbbbbbbbbbbb",
+        
+        ],
+    },{
+        time: 0,
+        bestTime: 10000,
+        stars: 0,
+        score: 0,
+        lock: false,
+        totalLevelScore: 0,
+        messages: ["You made it! Almost... All you have to do now is get past these robots! Don't worry, if you don't make it... Well, let's not think about that.","You arrive in a small storage room... Try moving some boxes around to see where it leads."],
+        level: [
+        "bbbbbbbbbbbb         ",
+        "bbbb   b  bbbbbbbbbbbb",
+        "bh    rb            ]b",
+        "b      b       $$   ]b",
+        "b      b $    ]b$   ]b",
+        "b    b bRb$   ]b$$$ ]b",
+        "b@ $$b$$$b$   ]bbb $]b",
+        "bbbbbbbbbbb?~ ]b   $]b",
+        "bbbbbbbbbbbbbbbb   bbb",
+        "bbbbbbbbbbbbb   $   ]b",
+        "b[          b   b   ]b",
+        "b[          b     $$]b",
+        "b[ c$$$c    b     bbbb",
+        "b[ cbbbcb   b   $$   b",
+        "b[ c   cb[      bb   b",
+        "b[ c P cb[      bO   b",
+        "b[3c  ?cb[$$$$$^b    b",
+        "bbbbbbbbbbbbbbbbbbbbbb",
+        
+        ],
+    },{
+        time: 0,
+        bestTime: 1000000,
+        stars: 0,
+        score: 0,
+        totalLevelScore: 0,
+        lock: false,
+        messages: ["STOP!\nI know I'm not supposed to help you but... Jumping might be a REALLY bad idea at this point. ","Hmm, you're captors are getting smarter! But, I'm sure it's nothing YOU can't figure out."],
+        level: [
+            "                        b      ",
+            "                        b      ",
+            "                        b      ",
+            "                        b      ",
+            "      b   b   b         bO     ",
+            "   b1 $$$$$$$$$   bbb   b      b",
+            "!  bbbbbbbbbbbbbbbb b   b      b",
+            "b                   b   b      b",
+            " b      $$          b@  bbbbbbbb",
+            "  b     ~           bbbbb      ",
+            "   bbbbbbb    b                ",
+            "               b               ",
+            "             c  b              ",
+            "             b  b$     h       b",
+            "         $       b$    h       b",
+            "         b        b$   h      $b",
+            "             $    bbbbbbbbbbb  ",
+            "             b               b ",
+            "      $$  $                   b",
+            "      ~   b             bb     ",
+            "     bbb               b  b    b",
+            "bb      b          <bbb    b  b",
+            "  b      bbbbbbbbbbbb      vbbbb",
+            "   b         R R R             b",
+            "    b                       c? b",
+            "     b                      bbPb",
+            "      b             b>      c  b",
+            "       bbbbbbbbbbbbbbbbbbbbbbbbb",
+        
+        ],
+    },{
+        time: 0,
+        bestTime: 1000000,
+        stars: 0,
+        score: 0,
+        totalLevelScore: 0,
+        lock: false,
+        level: [
+            "                                    ",
+            "       bbbbbbbbbbbbbbbbbbb        <b",
+            "       bb---   --  -----bb         b",
+            "       bb                b        $b",
+            " bbbbbbbbh  $$ $$h       ]b@ __   $b",
+            "bbbbbbbbb  $bbbbbb       ]bbbbbb  $b",
+            "bb        $bbbbbbb    $  ]b     b $b",
+            "bb       ~$b         $$$$]b1      $b",
+            "bb P     bb  $      $$b$$        $bb",
+            "bb       b  .c$     $bb~ $$$      bb",
+            "bb  c333^bc.ccc$ 3 ^bbbbbbbb>    cbb",
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            
+            ],
+    },{
+        time: 0,
+        bestTime: 1000000,
+        stars: 0,
+        score: 0,
+        totalLevelScore: 0,
+        lock: false,
+        level: [
+        "b            bb   bb                ",
+        "b            bb   bb                ",
+        "b            bb   bb                ",
+        "b             b c bb y    _  b[     ",
+        "b  bbbbbbbbb  bX bbb b[   b[ b[     ",
+        "b                b   - _$  b      ]b",
+        "bP R   r R       b    ]bb      $$ ]b",
+        "b              $ b          $$ b$   ",
+        "b  $$r$$ $$R  $$ b          bb ]b   ",
+        "bbbbbbbbbbbb$ bb bb[  b[  _      ___",
+        "bb          $$$b      b[ bb _    bbb",
+        "bb         cc$$b            b  $    ",
+        "bb        cccc$b   bb  b    b  b    ",
+        "bbx      ccccc b^~ --$$_________    ",
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbY bb",
+        "bbb  bbb  bbb  bb              b$   ",
+        "bb    b    b    bb              b$  ",
+        "b          $      bbbbbbbbbbbbbbbb$ ",
+        "b     $    $       ---     ---    b$",
+        "bb   $b$$$$b$$$$$                   ",
+        "bbb@ bbb$$bbb$$bb[$$H$$ b[$$H$$ b~ b",
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb ",
+        
+        ],
+    },{
+        time: 0,
+        bestTime: 1000000,
+        stars: 0,
+        score: 0,
+        totalLevelScore: 0,
+        lock: false,
+        messages: ["Hey! you made it! Welcome to the \"G\" lab. Ready to find out what the G is for?","WARNING!\nGravity is reversed from this point on!"],
+        level: [
+            "       bbbbbbbbbbbbb",
+            "bbbbbbbbb      ]b$ ",
+            "bbbbbbbb       ]b$@",
+            "bG----         ]b$bb",
+            "        bbbbb$ ]b  ",
+            "   b   b-  bb$ ]b  ",
+            "   -  bb   bb$ ]b  ",
+            " b    --   bb$ ]b  $",
+            "    _      bb$ ]b  $",
+            "    b _ ___bb  ]b  $",
+            "      b bbbbb $]b  $",
+            "           bb $]b   ",
+            "           vb $]b   ",
+            "            b $]b  ",
+            "  ______~ b b $]b  ",
+            " _bbbbbbbbb b  ]b$ ",
+            "_bb   $'    b  ]b$ ",
+            "bb          b  ]b$ ",
+            "b   cc  c   b$ ]b$ ",
+            "   $$$$ $$  b$  G  ",
+            "  bbbbbbbbbbb$     ",
+            "   b $$$$$$$b$     ",
+            "            b      ",
+            "            bbbbbbbb",
+            "bbbbbbb    bbbbbbbbb",
+            "b     b   bb  H  G$b",
+            "b                 $b",
+            "b P     b         $b",
+            "b     rbb         $b",
+            "b    ? --       ! $b",
+            "bbbbbbbbbbbbbbbbbbbb",
+            
+            ],
+    },{
+        time: 0,
+        bestTime: 1000000,
+        stars: 0,
+        score: 0,
+        totalLevelScore: 0,
+        lock: false,
+        level: [
+        "  bbbb    bbbbbbbb            ",
+        "bbb  bbbbbb      bbbbbbbbbbbbb",
+        "  $$       $$c $           bbb",
+        "  bb$$     bbbX       $ $ $  b",
+        "@ b$$$$$$  <bb $b$    bbbbb  b",
+        "bbbbbbbbbbbbb   bb$$  G   $$$b",
+        "bbbbbbbbbbbbb $ $bbb$$    bbbb",
+        "bb $$ b  $$$    $$bbbbbbbY $Gb",
+        "b1$$$ $  b  ~     $bb--bbbb[ b",
+        "bbbbbbbbbb  bb         $$Gb[ b",
+        "b$$$$$$$$$  bbbbb        bb[ b",
+        "b      $ $  $bbbb  b1$$b    $b",
+        "b   $  b b   4bbb  bbbbb    $b",
+        "b   $          bb          $$b",
+        "b   b          Gb          $bb",
+        "b  r  $ $  $$$bbb[    $$  $bbb",
+        "b  bP b b  $$bbbb[    $b ]bb b",
+        "b  bb      $bb  b[    bb ]b-$b",
+        "b 3       Hbbb        $$     b",
+        "bbbbbbbbbbbbbb     bb        b",
+        "bbbbbbbbbbbbbbxb3 H    H  3byb",
+        "            [bbbbbbbbbbbbbbbbb",
+        
+        ],
+    },{
+        time: 0,
+        bestTime: 1000000,
+        stars: 0,
+        score: 0,
+        totalLevelScore: 0,
+        lock: false,
+        messages: ["Your almost out! Just... don't expect this level to be easy! P.S. This level isn't finished!","The only way to get out is by pressing this self-destruct button. Good luck!"],
+        level: [
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "b  ybh      h  b-- $$$ G b           b",
+            "b bb           bx       b            b",
+            "b $    $$$  bb bb      b             b",
+            "bb          $$ b      b    ~         b",
+            "b$  bbbbbbbb$  b     b    bbb$$      b",
+            "b   $$--$$ b$  b    b       bbbb    ]b",
+            "b         bb   b     b$     b   b   ]b",
+            "b  3      $b  bbX b   b$    b     $bbb",
+            "bbbbbbbbb  b  G   b    b    b     b  b",
+            "b  G  $$   b      bb   G   $b    $   b",
+            "b       ___b    ~ b     33 $b    bbb b",
+            "bY bbbbbbbbbbbbbbbbbbbbbbbbbb$$     ]b",
+            "b  b          b  r   r   r  bbbb    ]b",
+            "b  b          b             b      $$b",
+            "b  b          b                   bbbb",
+            "b  b                                ]b",
+            "b  b                           $bb  ]b",
+            "b  b P  $$   bb                $bO  ]b",
+            "b@ b   ?bb! Bbb3$r$3$r$3$rc3~   b   ]b",
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            
+            ],
+    }
+];
+var gameState = "logo";
+var sound = true;
+var sounds = {
+    splat: getSound("rpg/hit-splat"),
+    Splat: getSound("rpg/battle-swing"),
+    crash: getSound("retro/boom1"),
+    collect: getSound("rpg/water-bubble"),
+    zap: getSound("retro/laser2"),
+    buzz: getSound("retro/laser1"),
+    save: getSound("retro/whistle2"),
+    open: getSound("retro/thruster-long"),
+    gravity: getSound("retro/laser3"),
+    
+};
+var keys = [];
+var grid = 40;
+var alarm = false;
+var alarmTime = 150;
+var blowUp = false;
+var pause = false;
+var respawnX = 0;
+var respawnY = 0;
+var saveG = true;
+var level_h = 400;
+var level_w = 400;
+var freez = false;
+var sF = 0.5;
+var playerSaved = false;
+var animation;
+var playerMove = true;
+var deadTimer = 0;
+var close = 0;
+var pauseY = -800;
+var closing = false;
+var click = false;
+var stats = false;
+var statsOn = false;
+var slideDown = 0;
+var selectDown = 0;
+var toSelect = false;
+var statsToSelect = false;
+var selectToGame = false;
+var toEnding = false;
+var screenOp = 0;
+var gameToPause = false;
+var pauseToGame = false;
+var pauseToSelect = false;
+var Select = false;
+var pauseButtons = false;
+var toMain = false;
+var score = 0;
+var space = [];
+var startGame = false;
+var waitTime = 0;
+var gravity = true;
+for(var i=0;i<40;i++){
+    space.push([random(400+10),random(400),random(5,12)]);
+}
+var sec = second();
+var remove = false;
+
+var star = getImage("cute/Star");
+var graphics = createGraphics(star.width, star.height, JAVA2D);
+if(graphics){
+    graphics.beginDraw();
+    graphics.background(255,255,255, 0);//transparent background
+    graphics.image(star);//What image to tint
+    graphics.endDraw();
+}
+
+mouseClicked = function(){
+    click = true;
+};
+var Hex = function(x,y,w,h,r){
+    pushMatrix();
+    translate(x,y);
+    rotate(r);
+    beginShape();
+    for(var i=0;i<360;i+=360/6){
+        vertex(cos(i)*w/2,sin(i)*h/2);
+    }
+    endShape(CLOSE);
+    popMatrix();
+};
+var button = function(x, y, w, h, message, txtSize,yoffset) {
+    if (mouseX>x&&mouseX<x+w&&mouseY>y+yoffset&&mouseY<y+h+yoffset) {
+        cursor(HAND);
+        fill(100, 100, 100, 100);
+    } else {
+        fill(150, 150, 150, 100);
+    }
+    strokeWeight(((w + h) / 2) / 30);
+    stroke(0, 255, 0);
+    rect(x, y, w, h);
+    fill(0, 0, 0);
+    textFont(createFont("monospace"));
+    textAlign(CENTER, CENTER);
+    textSize(txtSize);
+    text(message, x + w / 2, y + h / 2);
+    return mouseX>x&&mouseX<x+w&&mouseY>y+yoffset&&mouseY<y+h+yoffset&&click;
+};
+var typeWriter = function(index, str, x, y) {
+    var temp = str.substring(0, index);
+    textSize(12);
+    fill(255);
+    text(temp+(frameCount%50<=25?"|":" "), x, y,230,100);
+};
+var alien = function(x, y) {
+    pushMatrix();
+    translate(x,y);
+    if(gameState!=="story"){
+    scale(sF);
+    }
+    translate(-200,-200);
+    fill(2, 255, 0);
+    strokeWeight(2);
+    stroke(0, 158, 0);
+    beginShape();
+    curveVertex(232, 176);
+    curveVertex(231, 168);
+    curveVertex(220, 163);
+    curveVertex(207, 162);
+    curveVertex(195, 165);
+    curveVertex(186, 174);
+    curveVertex(178, 192);
+    curveVertex(171, 215);
+    curveVertex(166, 229);
+    curveVertex(163, 235);
+    curveVertex(158, 238);
+    curveVertex(158, 241);
+    curveVertex(163, 244);
+    curveVertex(170, 241);
+    curveVertex(180, 240);
+    curveVertex(190, 243);
+    curveVertex(198, 241);
+    curveVertex(206, 240);
+    curveVertex(211, 245);
+    curveVertex(221, 245);
+    curveVertex(225, 242);
+    curveVertex(231, 240);
+    curveVertex(240, 242);
+    curveVertex(244, 240);
+    curveVertex(242, 232);
+    curveVertex(241, 229);
+    curveVertex(239, 211);
+    curveVertex(239, 182);
+    curveVertex(231, 168);
+    endShape(CLOSE);
+    fill(255, 255, 255);
+    stroke(0);
+    ellipse(214, 190, 18, 20);
+    ellipse(235, 188, 13, 20);
+    fill(0, 0, 0);
+    ellipse(217, 191, 8, 10);
+    ellipse(237, 190, 6, 10);
+    noFill();
+    strokeWeight(1);
+    arc(226, 208, 20, 3, 36, 121);
+    popMatrix();
+};
+var Alien = function(x, y, direction) {
+    switch(direction){
+        case "right": alien(x, y); break;
+        case "left" : 
+            pushMatrix();
+            translate(x,y);
+            scale(-1, 1);
+            alien(0,0);
+            popMatrix();
+            break;
+        case "none": 
+            pushMatrix();
+        translate(x,y);
+        if(gameState!=="story"){
+        scale(sF);
+        }
+        translate(-200,-200);
+        fill(0, 255, 0);
+        strokeWeight(2);
+        stroke(0, 168, 39);
+        beginShape();
+        curveVertex(235, 216);
+        curveVertex(232, 189);
+        curveVertex(225, 171);
+        curveVertex(212, 163);
+        curveVertex(197, 161);
+        curveVertex(185, 165);
+        curveVertex(174, 178);
+        curveVertex(169, 206);
+        curveVertex(166, 229);
+        curveVertex(158, 240);
+        curveVertex(170, 242);
+        curveVertex(182, 240);
+        curveVertex(191, 243);
+        curveVertex(200, 245);
+        curveVertex(207, 240);
+        curveVertex(212, 239);
+        curveVertex(219, 242);
+        curveVertex(224, 243);
+        curveVertex(228, 240);
+        curveVertex(232, 239);
+        curveVertex(235, 239);
+        curveVertex(240, 239);
+        curveVertex(240, 232);
+        curveVertex(236, 223);
+        curveVertex(232, 189);
+        endShape(CLOSE);
+        fill(255, 255, 255);
+        stroke(0);
+        ellipse(190, 190, 18, 20);
+        ellipse(215, 190, 18, 20);
+        fill(0, 0, 0);
+        ellipse(190, 192, 8, 10);
+        ellipse(215, 192, 8, 10);
+        noFill();
+        strokeWeight(1);
+        arc(202, 208, 20, 3, 36, 121);
+        popMatrix();
+        break;
+        case "dead" : deadTimer++;
+        var flash = random(8, 12);
+        if (deadTimer > flash) {
+            deadTimer = 0;
+        }
+        if (deadTimer > flash / 2) {
+            fill(255, 255, 255);
+        } else {
+            fill(0, 0, 0);
+        }
+        pushMatrix();
+        translate(x,y);
+        scale(sF);
+        translate(-200,-200);
+        translate(random(-2, 2), random(-2, 2));
+        noStroke();
+        beginShape();
+        curveVertex(211, 177);
+        curveVertex(206, 169);
+        curveVertex(201, 163);
+        curveVertex(195, 166);
+        curveVertex(195, 173);
+        curveVertex(189, 176);
+        curveVertex(181, 176);
+        curveVertex(170, 178);
+        curveVertex(170, 185);
+        curveVertex(169, 193);
+        curveVertex(157, 204);
+        curveVertex(157, 211);
+        curveVertex(169, 217);
+        curveVertex(171, 228);
+        curveVertex(173, 232);
+        curveVertex(181, 233);
+        curveVertex(192, 231);
+        curveVertex(202, 233);
+        curveVertex(212, 235);
+        curveVertex(217, 228);
+        curveVertex(230, 225);
+        curveVertex(236, 217);
+        curveVertex(224, 214);
+        curveVertex(225, 204);
+        curveVertex(234, 200);
+        curveVertex(233, 191);
+        curveVertex(222, 184);
+        curveVertex(219, 177);
+        curveVertex(217, 172);
+        curveVertex(208, 170);
+        endShape(CLOSE);
+        ellipse(186, 170, 12, 10);
+        ellipse(191, 239, 16, 10);
+        ellipse(232, 213, 10, 13);
+        fill(255, 255, 255);
+        ellipse(185, 195, 18, 20);
+        ellipse(209, 195, 18, 20);
+        fill(0, 0, 0);
+        ellipse(185, 196, 10, 12);
+        ellipse(209, 196, 10, 12);
+        noFill();
+        stroke(255, 255, 255);
+        strokeWeight(1);
+        arc(196, 212, 20, -3, 36, 121);
+        popMatrix();
+        break;
+    }
+};
+var Rect = function(x,y,w,h,r){
+    pushMatrix();
+    translate(x,y);
+    rotate(r);
+    rect(0,0,w,h);
+    popMatrix();
+};
+var Escape= function(x,y){
+    pushMatrix();
+    translate(x-35,y);
+    fill(0,255,0);
+    noStroke();
+    Rect(50,40,21,80,0);
+    Rect(51,37,51,15,3);
+    Rect(50,72,45,15,0);
+    Rect(50,106,51,15,-1);
+    //S
+    noFill();
+    strokeWeight(17);
+    stroke(0,255,0);
+    arc(136,62,40,30,100,300);
+    arc(134,97,40,40,270,497);
+    //c
+    arc(194,82,49,62,51,311);
+    arc(200,82,49,62,51,311);
+    noStroke();
+    fill(0,255,0);
+    //A
+    stroke(0,255,0);
+    strokeWeight(20);
+    line(258,52,243,107);
+    line(258,52,281,114);
+    strokeWeight(10);
+    line(270,103,245,97);
+    noStroke();
+    quad(237,94,229,121,250,121,254,102);
+    //P
+    rect(300,40,20,76);
+    noFill();
+    strokeWeight(15);
+    stroke(0,255,0);
+    arc(322,68,37,40,255,458);
+    //E
+    fill(0,255,0);
+    noStroke();
+    Rect(355,44,20,69,4);
+    rect(355,44,51,15);
+    rect(355,71,45,15);
+    Rect(351,100,51,15,-5);
+    
+    fill(0,255,0);
+        noStroke();
+        //E
+        ellipse(56,121,12,40);
+        ellipse(67,112,12,40);
+        ellipse(97,54,10,28);
+        //S
+        ellipse(117,117,12,32);
+        //C
+        ellipse(168,100,12,40);
+        ellipse(177,117,12,40);
+        //A
+        ellipse(290,121,5,21);
+        ellipse(277,115,8,30);
+        ellipse(284,125,8,30);
+        ellipse(236,121,14,13);
+        ellipse(246,118,8,14);
+        //P
+        ellipse(344,75,8,30);
+        ellipse(336,88,10,30);
+        //E
+        ellipse(355,57,6,25);
+        ellipse(406,57,6,25);
+        ellipse(391,113,8,30);
+        ellipse(399,108,8,26);
+        //EYE
+        strokeWeight(3);
+        fill(255, 255, 255);
+        stroke(0, 0, 0);
+        ellipse(322,69,28,25);
+        fill(0, 0, 0);
+        ellipse(320,73,15,13);
+    popMatrix();
+
+};
+var Plan = function(x,y){
+    pushMatrix();
+    translate(x,y);
+    fill(125, 125, 125);
+    noStroke();
+    //P
+    rect(50,200,25,80);
+    noFill();
+    stroke(125);
+    strokeWeight(15);
+    arc(76,227,40,40,270,450);
+    arc(71,228,40,40,270,450);
+    //L
+    fill(125);
+    noStroke();
+    rect(130,200,25,80);
+    rect(130,260,50,20);
+    //A
+    Rect(203,275,78,20,-74);
+    rect(225,201,23,15);
+    rect(219,249,42,15);
+    Rect(258,280,78,20,-111);
+    triangle(201,280,205,269,221,280);
+    triangle(258,280,275,269,280,280);
+    //N
+    rect(291,200,25,80);
+    rect(339,200,25,80);
+    Rect(299,211,20,80,-30);
+    //p
+        stroke(82, 82, 82);
+        strokeCap(SQUARE);
+        strokeWeight(5);
+        point(55,275);
+        point(66,275);
+        point(55,205);
+        point(66,205);
+        strokeWeight(3);
+        line(73,280,73,200);
+        //L
+        strokeWeight(5);
+        point(172,275);
+        point(172,265);
+        point(136,205);
+        point(149,205);
+        point(136,267);
+        point(149,258);
+        strokeWeight(3);
+        line(131,279,155,261);
+        //A
+        line(246,201,221,280);
+        line(268,250,231,250);
+        strokeWeight(5);
+        point(208,275);
+        point(217,275);
+        point(239,205);
+        point(230,205);
+        point(249,244);
+        point(259,244);
+        point(258,266);
+        point(262,275);
+        //N
+        point(297,205);
+        point(309,205);
+        point(345,205);
+        point(357,205);
+        point(297,275);
+        point(309,275);
+        point(345,275);
+        point(357,275);
+        
+        strokeWeight(3);
+        line(340,280,340,200);
+        
+    popMatrix();
+    
+};
+
+{
+var Text = function(x,y,t,r){
+    pushMatrix();
+    translate(x,y);
+    rotate(r);
+    text(t,0,0);
+    popMatrix();
+};
+var SpaceB = function(){
+    this.stars = [];
+    this.time = 0;
+    this.speed = 3;
+    for(var i=0;i<150;i++){
+    this.stars.push([random(-400,400),random(400),random(2,10)]);
+    }
+    this.draw = function() {
+        this.time +=1/30;
+        background(4, 0, 122);
+        for(var i in this.stars){
+            strokeWeight(5);
+            stroke(255, 255, 255,50);
+            fill(255, 255, 255);
+            ellipse(this.stars[i][0],this.stars[i][1],this.stars[i][2],this.stars[i][2]);
+            
+            this.stars[i][0]+=this.speed;
+            if(this.stars[i][0]>400){
+                this.stars[i][0]=-400;
+            }
+            
+        }
+            if(this.time>6&&this.speed>0){
+                this.speed-=0.05;
+            }
+            if(this.speed<0){this.speed=0;}
+    };
+};
+var SpaceShip1 = function(x,y,s){
+    this.x=x-70;this.y=y; this.part=[];
+    this.pTime = 0;
+    this.draw = function() {
+        pushMatrix();
+        noStroke();
+        translate(this.x,this.y);
+        scale(s/10);
+        fill(135, 0, 0);
+        stroke(71, 0, 0);
+        strokeWeight(3);
+        triangle(-99,44,124,-26,81,50);
+        arc(-73,43,53,13,180,299);
+        fill(255, 255, 255);
+        stroke(92, 179, 255);
+        arc(108,6,159,112,183,315);
+        fill(92, 92, 92);
+        noStroke();
+        
+        
+        arc(89,8,41,50+cos(millis())*4,187,360);
+        fill(130, 0, 0);
+        stroke(84, 0, 0);
+        triangle(30,40,187,-45,186,69);
+        triangle(-9,42,176,98,115,25);
+        stroke(130, 0, 0);
+        line(-9,42,115,25);
+
+        fill(20, 20, 20);
+        stroke(0, 0, 0);
+        ellipse(182,12,30,119);
+        ellipse(189,12,30,119);
+        fill(0, 0, 0);
+        ellipse(197,12,30,119);
+        fill(20, 20, 20);
+        ellipse(198,-10,15,40);
+        ellipse(205,30,14,40);
+        ellipse(190,29,15,40);
+        
+        ellipse(203,-10,15,40);
+        ellipse(210,30,14,40);
+        ellipse(195,29,15,40);
+        
+        fill(77, 77, 77);
+        ellipse(208,-10,15,40);
+        ellipse(215,30,14,40);
+        ellipse(200,29,15,40);
+        this.pTime++;
+        if(this.pTime>10){
+        this.part.push([208,-10,10,30,100]);
+        this.part.push([215, 30,10,30,100]);
+        this.part.push([200, 29,10,30,100]);
+        this.pTime=0;
+        }
+        
+        noFill();
+        for(var i in this.part){
+                    stroke(255, 255, 255,this.part[i][4]);
+
+            ellipse(this.part[i][0],this.part[i][1],this.part[i][2],this.part[i][3]);
+            this.part[i][2]++;
+            this.part[i][3]++;
+            this.part[i][0]+=1;
+            this.part[i][4]-=3;
+        }
+        if(this.part.length>9){
+            this.part.shift();
+            this.part.shift();
+            this.part.shift();
+        }
+        popMatrix();
+    };
+};
+var SpaceShip2 = function(x,y,s){
+    this.x=x;this.y=y; this.part=[];
+    this.pTime = 0; this.captured = false;
+    this.draw = function() {
+        pushMatrix();
+        noStroke();
+        translate(this.x,this.y);
+        scale(s/10);
+        
+        fill(8, 8, 8);
+        arc(0,40,380,34,-15,208);
+        arc(0,45,360,34,-23,207);
+        fill(31, 31, 31);
+        arc(0,35,400,34,0,180);
+        fill(31, 31, 31);
+        quad(-200,36,-110,0,113,0,201,36);
+        fill(0, 0, 0);
+        strokeWeight(5);
+        stroke(15, 15, 15);
+        arc(0,0,224,118,180,360);
+        arc(0,0,224,18,0,180);
+        
+        strokeWeight(3);
+        stroke(128, 128, 128);
+        arc(0,0,204,101,204,257);
+        noStroke();
+        for(var i=0;i<20;i+=2){
+            this.f = round(random(3));
+            pushMatrix();
+            translate(0,-677);
+            rotate(80.5+i);
+            fill(255, this.f*85, 0);
+            rect(699,0,-3,16);
+            popMatrix();
+        }
+         for(var i=0;i<20;i+=2){
+            this.f = round(random(3));
+            pushMatrix();
+            translate(0,-1083);
+            rotate(80.2+i);
+            fill(255, this.f*85, 0);
+            rect(1136,0,-3,30);
+            
+            popMatrix();
+        }
+     
+        noStroke();
+         if(this.captured){
+             fill(255, 255, 255,20);
+             quad(-50,60,50,60,100,400,-100,400);
+             arc(0,400,200,50,0,180);
+             quad(-40,60,40,60,90,400,-90,400);
+             arc(0,400,180,50,0,180);
+             this.pTime++;
+             if(this.pTime>15){
+                 this.part.push([0,390,200,50]);
+                 this.pTime=0;
+             }
+             for(var i=0;i<this.part.length;i++){
+                 noFill();
+                 stroke(255, 255, 255,10);
+                 strokeWeight(5);
+                 ellipse(this.part[i][0],this.part[i][1],this.part[i][2],this.part[i][3]);
+                 this.part[i][1]-=2;
+                 this.part[i][2]-=0.8;
+                 this.part[i][3]-=0.3;
+             }
+             if(this.part.length>10){
+                 this.part.shift();
+             }
+         }
+        
+        popMatrix();
+    };
+};
+var syringes = function(x,y,rotation,colors){
+    pushMatrix();
+    translate(x,y);
+    rotate(rotation);
+        //shadows
+    noStroke();
+    fill(0, 0, 0,80);
+    ellipse(-50,69,71,100);
+    ellipse(-114,96,71,100);
+    stroke(199, 199, 199,140);
+    strokeWeight(3);
+    fill(colors);
+    rect(-20,-60,40,70,5);
+    fill(217, 217, 217,50);
+    rect(-20,-60,40,120,5);
+    fill(red(colors)-60,green(colors)-60,blue(colors)-60);
+    ellipse(0,7,40,10);
+    fill(176, 176, 176);
+    ellipse(0,61,40,10);
+    strokeWeight(8);
+    stroke(158, 158, 158);
+    line(0,10,0,89);
+    fill(176, 176, 176);
+    strokeWeight(1);
+    arc(0,61,40,10,180,360);
+    fill(133, 133, 133);
+    ellipse(0,94,50,10);
+    ellipse(0,97,50,10);
+    
+    fill(89, 89, 89);
+    noStroke();
+    triangle(-3,-60, 3,-60,0,-120);
+
+    popMatrix();
+    
+};
+var Weapons = function(){
+    this.time = 0;
+    this.done = false;
+    this.syringes = [
+        [430,370,-37,color(0, 255, 0)],
+        [200,440,0,color(255, 183, 0)],
+        [-10,400,30,color(162, 0, 255)],
+        [330,450,-20,color(142, 8, 209)],
+        [130,450,10,color(0, 163, 0)],];
+        
+    
+    this.draw = function() {
+    this.time++;
+    
+    for(var i=0;i<this.syringes.length;i++){
+        var s = this.syringes[i];
+        syringes(s[0],s[1],s[2],s[3]);
+        
+        if(this.time>100&&this.time<280){
+        s[0]+=cos(s[2]-90);
+        s[1]+=sin(s[2]-90);
+        }
+        if(this.time===1){
+            s[0]-=cos(s[2]-90)*80;
+            s[1]-=sin(s[2]-90)*80;
+        }
+    }
+    if(this.time>320){
+        this.done=true;
+    }
+    
+        
+    };
+};
+var beaker = function(x,y,type,color,s){
+    pushMatrix();
+    strokeWeight(2);
+    translate(x,y);
+    scale(s);
+    if(type===1){
+        fill(color);
+        stroke(191, 191, 191,150);
+        rect(0,0,10,40,5);
+        fill(255, 255, 255);
+        rect(-2,-2,14,5,5);
+        stroke(255, 255, 255,70);
+        strokeWeight(4);
+        point(5,10);
+        point(4,19);
+        point(7,26);
+        point(3,34);
+        
+    }else if(type===2){
+       
+        strokeWeight(2);
+        stroke(191, 191, 191,150);
+        
+        fill(191,191,191,150);
+        rect(-4,-30,8,30);
+        rect(-6.6,-34,12,5,3);
+        fill(color);
+        rect(-4,-24,8,30);
+        arc(0,0,30,30,-72,258);
+        strokeWeight(4);
+        stroke(191,191,191,60);
+        point(0,0);
+        point(10,0);
+        point(4,8);
+        point(-6,-11);
+        point(-5,4);
+        point(3,-10);
+        point(-12,0);
+        point(-3,11);
+        point(0,-18);
+    }else if(type===3){
+        fill(color);
+        stroke(191,191,191,150);
+        strokeWeight(2);
+        triangle(-15,-10,15,-10,0,-30);
+        fill(191,191,191,150);
+        rect(-4,-40,8,15);
+        rect(-6,-42,12,5,2);
+        fill(191);
+        rect(-4,-29,8,3);
+        stroke(191,191,191,50);
+        strokeWeight(4);
+        point(-10,-12);
+        point(8,-12);
+        point(-5,-17);
+        point(3,-19);
+        point(-2,-12);
+        
+    }
+    
+    popMatrix();
+};
+var Scene1 = function(){
+    this.background = new SpaceB();
+    this.captured = false;
+    this.ship1 = new SpaceShip1(0,0,7);
+    this.ship2 = new SpaceShip2(40,-2000,100);
+    this.done = false;
+    this.time =0;
+    this.scale1 = 1;
+    this.x1 = 200;
+    this.y1 = 200;
+    this.rotation1 = 0;
+    this.x2 = 200;
+    this.y2 = 200;
+    this.caught = false;
+    this.draw = function() {
+        this.time+=1/30;
+        this.background.draw();
+        
+        if(!this.captured){
+            pushMatrix();
+            translate(200+cos(millis()),200+cos(millis()/2)*5);
+            scale(this.s+cos(millis()/10)/20); 
+            this.ship1.draw();
+            popMatrix();
+        }else{
+            pushMatrix();       
+            translate(this.x1,this.y1);
+            scale(this.scale1); 
+            rotate(this.rotation1);
+            this.ship1.draw();
+            popMatrix();
+
+            pushMatrix();
+            translate(this.x2,this.y2);
+            scale(this.scale1);
+            rotate(this.rotation1);
+            this.ship2.draw();
+            popMatrix();
+            
+            if(this.time>13&&this.scale1>0.1){
+                this.scale1-=0.02;
+            }
+            if(this.time>19&&this.y2<300){
+                this.y2+=1;
+                this.y1-=0.5;
+            }
+            if(this.y2>=300){
+                this.caught = true;
+            }
+            if(this.caught){
+                this.ship2.captured = false;
+                if(this.rotation1<20){
+                    this.rotation1+=0.5;
+                }
+                if(this.rotation1>8){
+                    this.y1-=8;
+                    this.y2-=8;
+                    this.x2+=8;
+                    this.x1+=8;
+                }
+                if(this.y2<-100){
+                    this.done = true;
+                }
+                    
+                    
+                    
+            }
+        }
+        if(this.background.speed<=0.2&&!this.captured){
+            this.captured = true;
+            this.ship2.captured = true;
+        }
+        
+    };
+};
+var Scene2 = function(){
+    this.open = 0;
+    this.arrive = 0;
+    this.done = false;
+    this.draw = function() {
+        background(133, 0, 0);
+        strokeWeight(20);
+        stroke(0, 0, 0);
+        fill(46, 0, 0);
+        ellipse(200,250,500,300);
+        fill(10, 0, 0);
+        arc(200,361,500,300,200,340);
+        arc(200,249,500,300,20,150);
+        //chair
+        strokeWeight(5);
+        stroke(71, 0, 0);
+        fill(179, 0, 0);
+        rect(100,100,40,180,20);
+        rect(140,80,40,200,20);
+        rect(180,80,40,200,20);
+        rect(220,100,40,180,20);
+        quad(260,265,105,265,74,320,290,320);
+        rect(68,320,230,40,20);
+        fill(143, 143, 143);
+        stroke(0, 0, 0);
+        quad(282,224,364,228,402,340,321,340);
+        quad(282,224,266,254,302,352,321,340);
+        quad(402,340,389,351,302,352,321,340);
+        stroke(0, 0, 0);
+        strokeWeight(10);
+        line(356,255,345,282);
+        stroke(173, 173, 173);
+        strokeWeight(6);
+        line(356,255,345,282);
+        stroke(0, 0, 0);
+        strokeWeight(6);
+        line(354,318,328,243);
+        strokeWeight(3);
+        fill(0, 255, 0);
+        ellipse(321,297,15,15);
+        fill(255, 0, 0);
+        ellipse(330,322,15,15);
+        ellipse(312,270,15,15);
+        ellipse(302,246,15,15);
+        ellipse(357,250,20,20);
+        stroke(255, 255, 255);
+        arc(357,250,12,12,200,240);
+        
+        pushMatrix();
+        scale(1.5);
+        Alien(120,150,"none");
+        popMatrix();
+        noStroke();
+        fill(105, 225, 255);
+        ellipse(217,219,20,10);
+        ellipse(151,219,20,10);
+        fill(0, 255, 0);
+        ellipse(188,239,30,10);
+        fill(2, 255, 0);
+        stroke(0, 0, 0);
+        strokeWeight(3);
+        arc(204,237,40,37+cos(millis()),230,302);
+        arc(168,237,40,37+cos(millis()),232,302);
+        
+        arc(185,258,30+cos(millis()),15-cos(millis())*2,200,340);
+        
+        
+        //SpaceShip cover
+        fill(0, 0, 0,250);
+        stroke(31, 31, 31);
+        ellipse(200,221-this.open,500,400-this.open);
+        stroke(102, 102, 102);
+        noFill();
+        arc(200,221-this.open,460,360-this.open,200,272);
+        
+        fill(0, 0, 0,100);
+        noStroke();
+        ellipse(20,500-this.arrive,180,150);
+        ellipse(370,550-this.arrive,150,200);
+        if(this.arrive<120){
+            this.arrive++;
+        }
+        if(this.arrive>119){
+            this.open++;
+        }
+        if(this.open>500){
+            this.done=true;
+        }
+        
+        
+
+        
+        };
+};
+var Scene3 = function(){
+    this.W = new Weapons();
+    this.done = false;
+    this.draw = function() {
+    textAlign(LEFT,BASELINE);
+        background(153, 153, 153);
+        strokeWeight(5);
+        fill(255, 255, 255);
+        rect(-20,-20,440,150);
+        stroke(71, 0, 77);
+        fill(4, 48, 0);
+        rect(-20,20,122,80);
+        fill(255, 255, 255,100);
+        textSize(12);
+        textFont(createFont("cursive"));//writting on the board
+        text(" /ln(/cos x + i/sin x)=ix /\n          sqr / sqrt (180 *E)\n          m^23 / 13.5634^E",-43,40);
+        stroke(0, 0, 0);
+        
+        for(var i=0;i<400;i+=40){//draw the floor lines
+            strokeWeight(3);
+            line(i,130,i*2-200,400);
+            strokeWeight(1);
+            line(0,160+i,400,160+i);
+        }
+        strokeWeight(3);
+        fill(125, 125, 125);
+        rect(270,30,60,100);
+        fill(92, 92, 92);
+        rect(265,20,70,20);
+        
+        noStroke();
+        fill(71, 71, 71);
+        rect(275,45,50,15,4);
+        rect(275,65,50,15,4);
+        rect(275,85,50,15,4);
+        rect(275,105,50,15,4);
+
+        fill(255, 255, 255,80);
+        rect(200,0,200,130);
+        fill(102, 102, 102);
+        rect(265,125,70,10,4);
+        fill(0,255,0);
+        textSize(18);
+        textAlign(LEFT,BASELINE);
+        textFont(createFont(""));//reset the font
+        text("EXIT",282,37);
+        
+        strokeWeight(3);
+        stroke(55, 3, 94);
+        fill(230);
+        rect(120,20,130,30);
+        fill(71, 9, 94);
+        textAlign(CENTER,CENTER);
+        text("Testing lab",185,35);
+        
+        strokeWeight(5);
+        stroke(32, 0, 48);
+        fill(113, 0, 158);
+        
+        quad(280,160,120,160,40,350,360,350);//the table
+        rect(38,350,324,40,5);
+        pushMatrix();
+        translate(200,240);
+        scale(1.2,1.5+cos(millis()/2)/35);
+        Alien(0,0,"none");
+        popMatrix();
+        fill(255, 255, 255);
+        rect(323,182,10,79);
+        rect(380,286,10,79);
+        quad(310,162,430,164,536,306,375,300);
+        rect(55,182,10,79);
+        rect(42,209,10,79);
+        quad(-111,162,72,164,49,212,-336,200);
+        fill(0,255,0);
+        noStroke();
+        ellipse(203,242,70,100);//cover that face so we don't see that smile!
+        fill(87, 244, 255);//draw the tears
+        ellipse(173,223,8,15);
+        ellipse(228,223,8,15);
+        ellipse(163,228,8,10);
+        ellipse(238,233,8,10);
+        strokeWeight(3);
+        stroke(0);
+        fill(0,255,0);//draw the new face :(
+        arc(185,225,25,14+cos(millis()),200,320);
+        arc(219,225,25,14+cos(millis()),200,320);
+        arc(200,252,30,5+cos(millis()/2)*2,180,360);
+        noFill();
+        
+        strokeWeight(10);
+        stroke(0);
+        arc(200,330,500,100,240,302);
+        arc(200,241,500,100,249,292);
+        //the beakers
+        beaker(351,147,1,color(13, 255, 0),1.3);
+        beaker(393,193,3,color(255, 111, 0),1.3);
+        beaker(374,231,2,color(153, 0, 255),1.3);
+        
+        beaker(-1,129,1,color(13, 255, 0),1.3);
+        beaker(18,134,1,color(255, 170, 0),1.3);
+        beaker(37,127,1,color(255, 0, 247),1.3);
+        beaker(38,190,2,color(255, 0, 0),1);
+        fill(244);
+        textSize(26);
+        text("☠",374,226);
+        textSize(20);
+        text("☠",37,188);
+        this.W.draw();
+        if(this.W.done){
+            this.done = true;
+        }
+    };
+};
+var Scene4 = function(){
+    this.done = false;
+    this.close = false;
+    this.closeY = -400;
+    this.timer = 0;
+    this.rumble = false;
+    this.sec = 0;
+    this.pY = 223;
+    this.op = 0;
+    this.draw = function() {
+        textAlign(CENTER,CENTER);
+        if(this.pY>200){
+            this.pY-=0.5;
+        }
+        if(this.rumble === true){
+            translate(random(-5,5),random(-5,5));
+        }
+        this.timer += 1/30;
+        strokeWeight(2);
+        stroke(94, 94, 94);
+        background(112, 112, 112);
+        fill(150, 150, 150);
+         quad(0,400,400,400,320,330,80,330);
+         quad(0,0,400,0,320,30,80,30);
+         fill(156, 156, 156);
+         rect(80,30,240,300);
+         fill(115, 115, 115);
+         rect(100,80,200,40);
+         textSize(20);
+         fill(84, 84, 84);
+         textFont(createFont("monospace"));
+         text("Holding Block b14",200,100);
+         noStroke();
+         fill(0,0,0,40);
+         ellipse(171,(this.pY*1.5)+52,172,35);
+         scale(1.5);
+         Alien(131,this.pY,"none");
+         scale(1/1.5);
+         noStroke();
+         fill(0,255,0);
+         ellipse(200,(this.pY*1.5)+12,35,20);//cover the mouth
+         stroke(0, 0, 0);
+         strokeWeight(2);
+         arc(200,(this.pY*1.5)+23,25,6+cos(frameCount*3)*3,218,332);
+         pushMatrix();//jail bars
+         translate(0,this.closeY);
+         noStroke();
+         fill(59, 59, 59);
+         for(var i=0;i<=400;i+=50){
+             rect(i-7.5,0,13,400);
+         }
+         rect(0,400,400,20);
+         popMatrix();
+         
+         noStroke();
+         textSize(30);
+         fill(0,0,0,this.op);
+         rect(0,0,400,400);
+         fill(255,255,255,this.op);
+         text("Two days later...",200,200);
+         if(this.timer>4){
+             this.close = true;
+         }
+         if(this.close&&this.closeY<=-30){
+             this.closeY+=30;
+         }
+         if(this.closeY>=-15&&!this.rumble){
+             this.rumble = true;
+         }
+         if(this.rumble){
+             this.sec++;
+         }
+         if(this.sec>=3){
+             this.rumble = false;
+         }
+         if(this.timer>10){
+             this.op+=3;
+         }
+         if(this.op>255){
+             this.done = true;
+         }
+        
+    };
+};
+var Scene5 = function(){
+    this.done = false;
+    this.timer = 0;
+    this.discover = false;
+    this.x=42;
+    this.y=321;
+    this.moving = false;
+    this.op = 255;
+    this.draw = function() {
+        this.timer +=1/30;
+        strokeWeight(2);
+        stroke(40, 3, 77);
+        background(180, 177, 181);
+        fill(94, 87, 87);
+        rect(0,300,400,400);
+        fill(96, 59, 102);
+        rect(0,0,300,300);
+        fill(72, 2, 84);
+        quad(400,400,300,300,-10,300,-10,400);
+        fill(128, 128, 128);
+        rect(340,106,200,30);
+        fill(0,255,0);
+        textSize(45);
+        textFont(createFont(""));
+        textAlign(LEFT,BASELINE);
+        text("→",350,132.0);
+        fill(46, 43, 43);
+        stroke(18, 18, 18);
+        rect(284,0,20,300);
+        rect(300,0,4,304);//start bars behind
+        rect(310,0,4.5,315);
+        rect(325,0,5,330);
+        rect(345,0,5.5,351);
+        pushMatrix();
+        translate(this.x,this.y);
+        if(this.moving){
+        scale(1+sin(frameCount*3)/15,1+sin(180+frameCount*3)/25);
+        }
+        noStroke();
+        fill(0,0,0,70);
+        ellipse(-6,43,100,26);
+        if(this.timer>4&&this.timer<6){
+        Alien(0,0,"none");
+        }else{
+            Alien(0,0,"right");
+        }
+        if(this.discover){
+            fill(0,255,0);
+            noStroke();
+            ellipse(28,9,20,20);
+            fill(0, 51, 0);
+            stroke(12, 204, 12);
+            ellipse(28,9,9,8);
+            textSize(44);
+            fill(255);
+            Text(-27,-37,"?",-17);
+            Text(-1,-47,"!",10);
+        }
+        if(this.moving&&this.happy){
+            fill(0,255,0);
+            noStroke();
+            ellipse(28,9,20,20);
+            stroke(5, 5, 5);
+            arc(28,9,21,10,64,149);
+        }else if( this.moving&&!this.happy){
+            fill(0,255,0);
+            noStroke();
+            ellipse(28,9,20,20);
+            stroke(5, 5, 5);
+            arc(28,17,21,10,200,300);
+        }
+        popMatrix();
+        stroke(18);//start bars in front
+        fill(43);
+        rect(370,0,6,376);
+        rect(395,0,6.5,400);
+        triangle(300,0,400,0,400,30);
+        
+        if(this.op>0){
+            noStroke();
+            fill(0,0,0,this.op);
+            rect(0,0,400,400);
+            textFont(createFont("monospace"));
+            textSize(30);
+            fill(255,255,255,this.op);
+            textAlign(CENTER,CENTER);
+            text("Two days later...",200,200);
+        }
+        this.op -=3;
+        this.moving = false;
+        if(this.timer>9||this.timer<=4){
+            this.moving = true;
+        }
+        if(this.moving){
+            this.x+=0.6;
+        }
+        this.discover = false;
+        if(this.timer>6.8&&this.timer<9){
+            this.discover = true;
+            this.happy = true;
+        }
+        if(this.x>460){
+            this.done = true;
+        }
+    };
+};
+var Scene6 = function(){
+    this.done = false;
+    this.timer = 0;
+    this.grey = color(102, 102, 102);
+    this.green = color(0, 235, 0);
+    this.colors = [this.grey,this.grey,this.grey,this.grey];
+    this.x=42;
+    this.y=431;
+    this.color = color(71, 71, 71);
+    this.et = 0;
+    this.back = true;
+    this.moving = true;
+    this.op = 0;
+    this.s=[];
+    for(var i=0;i<20;i++){
+        this.s.push([random(122),random(85,218),random(2,8)]);
+    }
+    this.draw = function() {
+        background(186, 186, 186);
+        strokeWeight(2);
+        stroke(107, 107, 107);
+        fill(107, 107, 107);
+        rect(300,0,100,400);
+        fill(145, 145, 145);
+        quad(0,300,0,400,400,400,300,300);
+        for(var i=0;i<100;i+=11+i/4){
+            line(0,300+i,318+i,300+i);
+        }
+        for(var i=0;i<300;i+=30){
+            line(i,300,i*1.3,400);
+        }
+        strokeWeight(10);
+        fill(13, 0, 128);
+        stroke(56, 56, 56);
+        rect(-20,76,150,150);
+        fill(255, 255, 255);
+        strokeWeight(3);
+        stroke(255,255,255,100);
+        for(var i in this.s){
+            ellipse(this.s[i][0],this.s[i][1],this.s[i][2],this.s[i][2]);
+        }
+        strokeWeight(2);
+        quad(330,100,330,130,410,160,410,111);
+        fill(255, 0, 0);
+        pushMatrix();
+        textSize(23);
+        translate(368,124);
+        rotate(-24);
+        scale(0.74,1);
+        rotate(31);
+        scale(0.7,1);
+        textFont(createFont(""));
+        textAlign(CENTER,CENTER);
+        text("Testing lab >",0,0);
+        popMatrix();
+        
+            pushMatrix();
+            translate(180,301);
+            scale(1.2);
+            fill(56, 56, 56);
+            strokeWeight(6);
+            stroke(99, 99, 99);
+            rect( -10, -10, 60, -100);
+            strokeWeight(3);
+            rect( -15, -100, 70, -20);
+            noStroke();
+            quad(-20, 0, -10, -10, 50, -10, 60, 0);
+            fill(this.color);
+            quad(-16, -2, -10, -8, -2, -8, -8, -2);
+            quad(56, -2, 50, -8, 42, -8, 48, -2);
+            quad( 18, -2, 18, -8, 2, -8, -4, -2);
+            quad( 22, -2, 22, -8, 38, -8, 44, -2);
+            
+            textAlign(CENTER, CENTER);
+            fill(0, 255, 0, 100);
+            textSize(18);
+            text("EXIT", 20, -110);
+            fill(0, 255, 0, 150);
+            textSize(17);
+            text("EXIT", 20, -110);
+            fill(0, 255, 0);
+            textSize(16);
+            text("EXIT", 20, -110);
+            fill(this.colors[0]);
+            rect(-2.5, -30, 45, 15, 5);
+            fill(this.colors[1]);
+            rect(-2.5, -50, 45, 15, 5);
+            fill(this.colors[2]);
+            rect(-2.5, -70, 45, 15, 5);
+            fill(this.colors[3]);
+            rect(-2.5, -90, 45, 15, 5);
+            fill(this.green);
+            for (var i = 0; i < 80; i += 20) {
+                rect(-12, -i - 30, 3, 6);
+                rect( 48, -i - 30, 3, 6);
+            }
+            popMatrix();
+            pushMatrix();
+            translate(this.x,this.y);
+            if(this.back){
+                scale((100-this.y)/-200,(100-this.y)/-200+cos(frameCount*10)/15);
+            }else{
+                scale((100-this.y)/-200);
+            }
+            noStroke();
+            fill(0,0,0,30);
+            ellipse(-5,40,100,35);
+            Alien(0,0,"none");
+            if(this.back){
+                noStroke();
+                fill(0,255,0);
+                ellipse(0,0,58,59);
+            }
+            popMatrix();
+            if(this.op>0){
+                noStroke();
+                fill(0,0,0,this.op);
+                rect(0,0,400,400);
+                fill(255,255,255,this.op);
+                textSize(25);
+                text("And so, it is now up to you to help Blobby Escape. You will face many great challenges along the way. But, whatever you do, make sure he makes it back home. For the sake of planet Bloopiter depended on him. And now, it depends on YOU.",50,0,300,400);
+                textSize(10);
+                text("Animation by Jacob",350,385);
+                textSize(13);
+                fill(255,255,255,(255/2)+cos(frameCount*3)*255);
+                text("Click to go back to menu!",200,380);
+            }
+            ///////////////////////////////
+            if(!this.back){
+                this.et++;
+                if(this.et>0){this.color = this.green;}
+                if(this.et>30){this.colors[0] = this.green;}
+                if(this.et>60){this.colors[1] = this.green;}
+                if(this.et>90){this.colors[2] = this.green;}
+                if(this.et>120){this.colors[3] = this.green;}
+                if(this.et>150){this.op+=1;}
+            }
+            if(this.y>258){
+                this.x+=0.94;
+                this.y-=1;
+            }
+            if(this.y<=258){
+                this.back = false;
+            }
+        
+    };
+};
+var Animation = function(){
+    this.scene1 = new Scene1();
+    this.scene2 = new Scene2();
+    this.scene3 = new Scene3();
+    this.scene4 = new Scene4();
+    this.scene5 = new Scene5();
+    this.scene6 = new Scene6();
+    this.draw = function() {
+        if(!this.scene1.done){
+            this.scene1.draw();
+        }
+        if(this.scene1.done&&!this.scene2.done){
+            this.scene2.draw();
+        }
+        if(this.scene2.done&&!this.scene3.done){
+            this.scene3.draw();
+        }
+        if(this.scene3.done&&!this.scene4.done){
+            this.scene4.draw();
+        }
+        if(this.scene4.done&&!this.scene5.done){
+            this.scene5.draw();
+        }
+        if(this.scene5.done&&!this.scene6.done){
+            this.scene6.draw();
+        }
+        
+    };
+};
+}///Animation 1 stuff
+{
+    var bloopiter = function(x,y,s){
+    pushMatrix();
+    translate(x,y);
+    scale(s/10);
+    noStroke();
+    fill(255,255,255,30);
+    ellipse(-5,-8,300,300);
+    fill(255, 191, 0);
+    ellipse(0,0,250,250);
+    fill(201, 127, 0);
+    ellipse(20,20,40,40);
+    ellipse(-20,40,30,30);
+    ellipse(-45,-30,50,50);
+    ellipse(40,91,35,35);
+    ellipse(47,-74,35,35);
+    ellipse(84,2,50,50);
+    ellipse(-21,-83,25,25);
+    pushMatrix();
+    translate(-2,2);
+    fill(255, 191, 0);
+    ellipse(20,20,35,35);
+    ellipse(-20,40,25,25);
+    ellipse(-45,-30,45,45);
+    ellipse(40,91,30,30);
+    ellipse(47,-74,30,30);
+    ellipse(84,2,45,45);
+    ellipse(-21,-83,20,20);
+    popMatrix();
+    fill(161, 0, 0,100);
+    
+    beginShape();
+    vertex(0,-250/2);
+    bezierVertex(-130,-143,-203,107,0,125);
+    bezierVertex(-85,125,-182,-62,-0,-125);
+    endShape();
+    popMatrix();
+};
+    var EndingScene1 = function(){
+        this.x=160;this.y=215;
+        this.timer = 0; this.bg = new SpaceB();
+        this.ship1 = new SpaceShip1(0,0,1);
+        this.ship2 = new SpaceShip2(-49,129,19);
+        this.zoom = 1.0;
+        this.doorY = 2;
+        this.zoomX = 0;
+        this.r = [];
+        this.sm = [];
+        this.p = [];
+        this.oop = 255;
+        this.et = 0;
+        this.sx = 170;
+        this.sy = 180;
+    for(var i=0;i<100;i++){
+        this.sm.push([this.sx+random(-20,20),this.sy+random(-20,20),random(360),random(30,40),random(0,3),random(150,200)]);
+    }
+    for(var i=0;i<20;i++){
+        this.p.push([this.sx,this.sy,random(-20),random(20),random(-20),random(20),random(360),random(0.6,4)]);
+    }
+        this.draw = function() {
+            this.timer+=1/30;
+            this.bg.speed = 0;
+            this.bg.draw();
+            //background(16, 5, 130);
+            pushMatrix();
+            translate(this.zoomX,0);
+            scale(this.zoom);
+            pushMatrix();
+            translate(this.x,this.y);
+            scale(-1,1);
+            if(this.doorY>=40||this.x>165){
+                this.ship1.draw();
+            }
+            popMatrix();
+            noStroke();
+            for(var i in this.r){
+                    fill(255, this.r[i][2], 0,this.oop-60);
+                    pushMatrix();
+                    translate(this.sx,this.sy);
+                    rotate(this.r[i][0]);
+                    triangle(0,0,400,400,400-this.r[i][1],400+this.r[i][1]);
+                    popMatrix();
+                }
+            if(this.oop>100){
+            stroke(10);
+            strokeWeight(6);
+            line(164,231,233,220+this.doorY);
+            this.ship2.draw();
+            }
+            
+            if(this.timer>1&&this.doorY<40){
+                this.doorY++;
+            }
+            if(this.doorY>=40||this.x>165){
+                if(this.y<255){
+                    this.y+=2;
+                }
+                this.x+=3;
+            }
+            if(this.x>300&&this.doorY>0){
+                this.doorY-=2;
+            }
+            if(this.timer>2){
+                this.zoomX-=0.6;
+            }
+            if(this.timer>7){
+                this.explode = true;
+            }
+            if(this.explode){
+                this.et++;
+                if(this.r.length<20&&frameCount%6===0){
+                this.r.push([this.et*157,random(2,40),random(150,250)]);
+                }
+        fill(100,100,100,this.oop*3);
+        noStroke();
+        if(this.r.length>19){
+            this.oop-=3;
+            for(var i in this.sm){
+                var s = this.sm[i];
+                fill(255,s[5],0,this.oop);
+                ellipse(s[0],s[1],s[3],s[3]);
+                s[3]+=2;
+                s[0]+=cos(s[2])*s[4];
+                s[1]+=sin(s[2])*s[4];
+            }
+            
+            
+            if(this.oop>0){
+            filter(BLUR);
+            }
+            fill(89, 89, 89,this.oop);
+        for(var i in this.p){
+            pushMatrix();
+            translate(this.p[i][0],this.p[i][1]);
+            rotate(this.p[i][6]);
+            quad(this.p[i][2],-10,this.p[i][3],10,15,this.p[i][4],this.p[i][5],-14);
+            popMatrix();
+            this.p[i][0]+=cos(this.p[i][6])*this.p[i][7];
+            this.p[i][1]+=sin(this.p[i][6])*this.p[i][7];
+        }
+        }
+            }
+            
+            popMatrix();
+        if(this.oop<=-100){
+            this.done = true;
+        }
+        };
+        
+};
+    var EndingScene2 = function(){
+        this.x=0;
+        this.y=435;
+        this.s=5;
+        this.scale = 1;
+        this.timer = 0;
+        this.done = false;
+        this.ss=0.003;
+        this.s1 = new SpaceShip1(0,0,20);
+        this.bg = new SpaceB();
+        this.draw = function() {
+            this.timer+=1/30;
+            this.bg.speed=0;
+            this.bg.draw();
+            bloopiter(330,80,3);
+            
+            pushMatrix();
+            translate(this.x,this.y);
+            scale(this.scale);
+            scale(-1,1);
+            this.s1.draw();
+            popMatrix();
+            if(this.s>0.5){
+            this.s-=0.02;
+            }
+            this.x+=this.s/2;
+            this.y-=this.s/2;
+            if(this.scale>0.001){
+                this.ss*=0.9999;
+                this.scale -=this.ss;
+            }
+            if(this.timer>11){
+                this.done = true;
+            }
+            
+        };
+        
+};
+    var EndingScene3 = function(){
+        this.x=573;
+        this.y=100;
+        this.timer = 0;
+        this.done = false;
+        this.s=4;
+        this.s1 = new SpaceShip1(0,0,3);
+        this.op = 0;
+        this.bg = new SpaceB();
+        this.draw = function() {
+            this.timer+=1/30;
+            this.bg.speed = 0;
+            this.bg.draw();
+            pushMatrix();
+            translate(this.x,this.y);
+            rotate(cos(45+this.timer*30)*15);
+            this.s1.draw();
+            popMatrix();
+            
+            bloopiter(200,605,30);
+            textAlign(CENTER,CENTER);
+            textSize(78);
+            fill(255,255,255,this.op);
+            textFont(createFont(""));
+            pushMatrix();
+            translate(200,156);
+            scale(0.57,1);
+            text("To Be Continued...",0,0);
+            popMatrix();
+            this.x-=this.s*2;
+            this.y+=1;
+            if(this.s>0){
+                this.s-=0.023;
+            }
+            if(this.x<-100){
+                this.op+=2;
+            }
+            if(this.op>200){
+                fill(255,255,255,255/2+cos(frameCount*3)*255/2);
+                textSize(13);
+                text("Click to go back",200,380);
+            }
+            
+        };
+        
+};
+    var Ending = function(){
+        this.scene1 = new EndingScene1();
+        this.scene2 = new EndingScene2();
+        this.scene3 = new EndingScene3();
+        this.draw = function() {
+            if(!this.scene1.done){
+                this.scene1.draw();
+            }
+            if(this.scene1.done&&!this.scene2.done){
+                this.scene2.draw();
+            }
+            if(this.scene2.done&&!this.scene3.done){
+                this.scene3.draw();
+            }
+        };
+};
+    var ending;
+}//Ending animation stuff
+
+var crateImg = createGraphics(42,42,P2D);
+if(crateImg){
+crateImg.background(0,0,0,0);
+crateImg.strokeWeight(6);
+crateImg.stroke(150, 150, 150);
+crateImg.fill(90);
+crateImg.rect(2,2,37,37,2);
+crateImg.strokeWeight(12);
+crateImg.point(6,6);
+crateImg.point(6,34);
+crateImg.point(34,34);
+crateImg.point(34,6);
+crateImg.stroke(0,255,0);
+crateImg.strokeWeight(4);
+crateImg.point(6,6);
+crateImg.point(6,34);
+crateImg.point(34,34);
+crateImg.point(34,6);
+}//the crate image
+var robotImg = createGraphics(42,42,P2D);
+if(robotImg){
+robotImg.background(255, 255, 255,0);
+robotImg.fill(217);
+robotImg.stroke(217 - 40);
+robotImg.strokeWeight(2);
+robotImg.ellipse(21,21, 40, 40); //the body
+robotImg.noFill();
+robotImg.strokeWeight(0.2);
+robotImg.stroke(0);
+robotImg.arc(21,1, 30, 10, 126, 128.3);
+robotImg.arc(21,11, 40, 10, 13, 16);
+robotImg.arc(21,21, 40, 10, 170, 173);
+robotImg.arc(21,31, 35, 10, 132, 135);
+robotImg.pushMatrix();
+robotImg.fill(255, 0, 0);
+robotImg.translate(30, 20);
+robotImg.rotate(-38);
+robotImg.arc(0,0, 10, 8, -13, -9);
+robotImg.strokeWeight(2);
+robotImg.stroke(0);
+robotImg.line(-5, -1, 5, -2);
+robotImg.popMatrix();
+            //second eye
+robotImg.strokeWeight(0.2);
+robotImg.stroke(217 - 40);
+robotImg.pushMatrix();
+robotImg.fill(255, 0, 0);
+robotImg.translate(10,20);
+robotImg.rotate(38);
+robotImg.arc(0, 0, 10, 8, -13,-9);
+robotImg.strokeWeight(2);
+robotImg.stroke(0);
+robotImg.line(-5, -2, 5, -1);
+robotImg.popMatrix();
+            //irises
+robotImg.strokeWeight(3);
+robotImg.point(10,20);
+robotImg.point(30,20);
+            //mouth
+robotImg.fill(255, 255, 255);
+robotImg.strokeWeight(0.5);
+robotImg.rect(10, 29, 20, 5);
+robotImg.line(10, 31, 30, 31.5);
+robotImg.popMatrix();
+}
+var bossRobotImg = createGraphics(42,42,P2D);
+if(bossRobotImg){
+bossRobotImg.background(255, 255, 255,0);
+bossRobotImg.fill(43);
+bossRobotImg.stroke(3);
+bossRobotImg.strokeWeight(2);
+bossRobotImg.ellipse(21,21, 40, 40); //the body
+bossRobotImg.noFill();
+bossRobotImg.strokeWeight(0.2);
+bossRobotImg.stroke(0);
+bossRobotImg.arc(21,1, 30, 10, 126, 128.3);
+bossRobotImg.arc(21,11, 40, 10, 13, 16);
+bossRobotImg.arc(21,21, 40, 10, 170, 173);
+bossRobotImg.arc(21,31, 35, 10, 132, 135);
+bossRobotImg.pushMatrix();
+bossRobotImg.fill(255, 0, 0);
+bossRobotImg.translate(30, 20);
+bossRobotImg.rotate(-38);
+bossRobotImg.arc(0,0, 10, 8, -13, -9);
+bossRobotImg.strokeWeight(2);
+bossRobotImg.stroke(0);
+bossRobotImg.line(-5, -1, 5, -2);
+bossRobotImg.popMatrix();
+            //second eye
+bossRobotImg.strokeWeight(0.2);
+bossRobotImg.stroke(3);
+bossRobotImg.pushMatrix();
+bossRobotImg.fill(255, 0, 0);
+bossRobotImg.translate(10,20);
+bossRobotImg.rotate(38);
+bossRobotImg.arc(0, 0, 10, 8, -13,-9);
+bossRobotImg.strokeWeight(2);
+bossRobotImg.stroke(0);
+bossRobotImg.line(-5, -2, 5, -1);
+bossRobotImg.popMatrix();
+            //irises
+bossRobotImg.strokeWeight(3);
+bossRobotImg.point(10,20);
+bossRobotImg.point(30,20);
+            //mouth
+bossRobotImg.fill(255, 255, 255);
+bossRobotImg.strokeWeight(0.5);
+bossRobotImg.rect(10, 29, 20, 5);
+bossRobotImg.line(10, 31, 30, 31.5);
+bossRobotImg.popMatrix();
+}
+
+var spark = function(x, y, r,on,ra) { //for the lasers
+    pushMatrix();
+    translate(x, y);
+    rotate(r);
+    strokeWeight(1);
+    stroke((on?color(color(255, ra, 0)):color(255, 0, 0, 20)));
+    line(0, 0, random(5, 10), -random(3, 8));
+    line(0, 0, random(-5, -10), -random(3, 8));
+    line(0, 0, random(3, 8), -random(3, 8));
+    line(0, 0, -random(3, 8), -random(3, 8));
+    popMatrix();
+};
+var base = function(x, y, r) { //for the lasers
+    pushMatrix();
+    translate(x, y);
+    rotate(-90 + r);
+    stroke(112, 112, 112);
+    strokeWeight(2);
+    fill(82, 82, 82);
+    ellipse(0, 0, 7, 30);
+    beginShape();
+    noStroke();
+    vertex(15, 4);
+    vertex(10, 0);
+    vertex(15, -4);
+    vertex(0, -10);
+    vertex(0, 10);
+    endShape(CLOSE);
+    stroke(138, 138, 138);
+    line(15, 4, 4, 7);
+    popMatrix();
+};
+var Camera = function(x,y){
+    this.x=x; this.y=y; this.w=400; this.h = 400;
+    this.view = function(obj){
+        return obj.x+obj.w>this.x-200&&obj.x<this.x+200&&
+                obj.y+obj.h>this.y-200&&obj.y<this.y+200;
+    };
+    this.follow = function(plyer){
+        this.angle = atan2(plyer.y-this.y, plyer.x-this.x);
+        this.v = dist(this.x,this.y,plyer.x,plyer.y)/8;
+        this.x+=cos(this.angle)*this.v;
+        this.y+=sin(this.angle)*this.v;
+        
+        this.x = constrain(this.x,this.w/2,level_w-this.w/2);
+        this.y = constrain(this.y,this.h/2,level_h-this.h/2);
+        translate(200-round(this.x),200-round(this.y));
+    };
+};
+var cam = new Camera(200,200);
+
+var collide=function(obj1,obj2){ 
+    return obj1.x<obj2.x+obj2.w&&obj1.x+obj1.w>obj2.x&& 
+    obj1.y<obj2.y+obj2.h&&obj1.y+obj1.h>obj2.y;
+};
+
+var ScoreBar = function(){
+    this.scale = 1.3;
+    this.draw = function(stardust) {
+        this.scale = constrain(this.scale,1.3,1.8);
+        this.scale-=0.03;
+        fill(128, 128, 128);
+        noStroke();
+        rect(0,-5,400,35,5);
+        rect(-5,-5,70,60,5);
+        pushMatrix();
+        imageMode(CENTER);
+        translate(28,16);
+        rotate(-20+cos(millis()/2)*3);
+        scale(this.scale);
+        tint(150,255,0,255);
+        image(graphics,0,0,60,85);
+        tint(255,255,255,255);
+        popMatrix();
+        fill(84, 84, 84);
+        rect(65,5,300,20,3);
+        fill(136, 255, 0);
+        rect(65,5,300/stardust.length*score,20,3);
+        if(score>0&&score<stardust.length){
+            rect(65+300/stardust.length*score-2,5,3,20);
+        }
+        stroke(36, 36, 36);
+        strokeWeight(2);
+        line(65+40/100*300,6,65+40/100*300,23);
+        line(65+75/100*300,6,65+75/100*300,23);
+        line(65+99/100*300,6,65+99/100*300,23);
+        imageMode(CORNER);
+    };
+};
+
+var Player = function(x,y){
+    this.x=x; this.y=y;
+    this.w=40; this.h=40; 
+    this.speed = 0.5;
+    this.yvel = 0; this.xvel = 0;
+    this.gravity = 0.3; this.JH = 7.5;
+    this.falling = false; this.speedLimit = 5;
+    this.fallLimit = 8; this.dead = false;
+    this.deadTimer = 0;
+    this.st = 0;
+    this.update = function(blocks){
+        if(!gravity){
+            this.gravity = -0.3;
+            this.JH = -7.5;
+        }else{
+            this.gravity = 0.3;
+            this.JH = 7.5;
+        }
+        
+        if(!this.dead){
+        if(keys[UP]&&!this.falling){ this.yvel=-this.JH;}
+        if(keys[RIGHT]){this.xvel+=this.speed;}
+        if(keys[LEFT]){ this.xvel-=this.speed;} 
+        if(!keys[RIGHT]&&!keys[LEFT]){
+        if(this.xvel>0){this.xvel-=this.speed;}
+        if(this.xvel<0){this.xvel+=this.speed;}
+        }
+        
+        
+        if(!playerMove){
+            this.xvel = 0; 
+            this.yvel = 0;
+        }
+        
+        this.xvel=constrain(this.xvel,-this.speedLimit,this.speedLimit);
+        if(this.yvel>this.fallLimit){ this.yvel=this.fallLimit; }
+        this.x+=this.xvel;
+        this.applyCollision(blocks,this.xvel,0); // apply speed and collisions
+        this.falling=true;
+        this.y+=this.yvel;
+        this.applyCollision(blocks,0,this.yvel);
+        this.yvel+=this.gravity;
+        this.x = constrain(this.x,0,level_w-this.w);
+        if(this.falling){
+            this.st=0;
+        }
+        }else if(this.dead){
+            this.xvel = 0;
+            this.yvel = 0;
+            this.deadTimer++;
+            if(this.deadTimer>40){
+            sF-=0.01;
+            }
+            if(sF<0.1){
+                this.reset = true;
+            }
+        }
+    };
+    this.draw = function() {
+        pushMatrix();
+        translate(this.x+20,this.y+20);
+        if(!gravity){
+        scale(1,-1);
+        }
+        if(!this.dead){
+            if(keys[RIGHT]){ Alien(0,0,"right"); }else
+            if(keys[LEFT]){ Alien(0,0,"left"); }else{
+                Alien(0,0,"none");
+            }
+        }else{
+            Alien(0,0,"dead");
+        }
+        popMatrix();
+    };
+    this.applyCollision=function(obj,velx,vely){
+    for(var i=0; i<obj.length; i++){
+        if(collide(this,obj[i])){ // handle collisions
+            if(vely>0){ 
+                this.yvel=0; 
+                this.y=obj[i].y-this.h; 
+                if(gravity){
+                    if(sound&&this.falling&&this.st===0){playSound(sounds.Splat); playSound(sounds.splat);}
+                    this.falling=false;
+                    this.st++;
+                }else {
+                    this.falling = true;
+                    this.st = 0;
+                    
+                }}
+            if(vely<0){ 
+                this.yvel=0;
+                this.y=obj[i].y+obj[i].h; 
+                if(gravity){
+                    this.falling=true;
+                    this.st = 0;
+                }else{
+                    if(sound&&this.falling&&this.st===0){playSound(sounds.Splat); playSound(sounds.splat);}
+                    this.falling=false;
+                    this.st++;
+                }
+            }
+            if(velx<0){ 
+                obj[i].xvel=this.xvel; 
+                if(obj[i].fixed){
+                    this.xvel=0; 
+                }else if(keys[LEFT]){
+                    this.xvel = -3;
+                }
+                this.x=obj[i].x+obj[i].w; 
+            }
+            if(velx>0){ 
+                obj[i].xvel=this.xvel;
+                if(obj[i].fixed){
+                    this.xvel=0; 
+                }else if(keys[RIGHT]){
+                    this.xvel = 3;
+                }
+                this.x=obj[i].x-this.w;
+            }
+        }
+    }
+};
+};
+
+var blocks;
+var Block = function(x,y,w,h,fixed){
+    this.x=x; this.y=y; this.w=w; this.h=h;
+    this.fixed = fixed; this.xvel = 0; this.yvel = 0;
+    this.draw = function() {
+        if(cam.view(this)){
+        noStroke(); 
+        if(this.fixed){
+            fill(71, 0, 71,220);
+        rect(this.x,this.y,this.w,this.h);  
+        }else{
+            tint(255,255,255,255);
+            image(crateImg,this.x,this.y,this.w,this.h);
+        }
+        }
+    };
+    this.update = function(player){
+        if(!this.fixed){
+            if(gravity){
+                this.gravity = 0.4;
+            }else{
+                this.gravity = -0.4;
+            }
+            
+            if(this.xvel>0){
+                this.xvel-=0.2;
+                if(this.xvel<0.3){this.xvel=0;}
+            }
+            if(this.xvel<0){
+                this.xvel+=0.2;
+                if(this.xvel>-0.3){this.xvel=0;}
+            }
+            this.x+=this.xvel;
+            this.collideWith(this.xvel,0,blocks);
+            this.collideWithPlayer(this.xvel,0,player);
+            
+            this.y+=this.yvel;
+            this.collideWith(0,this.yvel,blocks);
+            this.collideWithPlayer(0,this.yvel,player);
+            this.yvel+=this.gravity;
+            
+        }
+    };
+    this.collideWith = function(xv, yv, platforms) {
+        for (var i = 0; i < platforms.length; i++) {
+            var p = platforms[i];
+            if (collide(this,p)&&(p.x!==this.x||p.y!==this.y)) {
+                // BOTTOM
+                if (yv > 0) {
+                    this.yvel = 0;
+                    this.falling = false;
+                    this.y = p.y - this.h;
+                }
+                // TOP
+                if (yv < 0) {
+                    this.yvel = 0;
+                    this.falling = true;
+                    this.y = p.y + p.h;
+                }
+                // RIGHT
+                if (xv > 0) {
+                    this.xvel = 0;
+                    this.x = p.x - this.w;
+                }
+                // LEFT
+                if (xv < 0) {
+                    this.xvel = 0;
+                    this.x = p.x + p.w;
+                }
+            }
+        }
+    };
+    this.collideWithPlayer = function(xv, yv,player) {
+        var p = player;
+        if (collide(this,p)) {
+            // BOTTOM
+            if (yv > 0) {
+                this.yvel = 0;
+                this.falling = false;
+                this.y = p.y - this.h;
+            }
+            // TOP
+            if (yv < 0) {
+                this.yvel = 0;
+                this.falling = true;
+                this.y = p.y + p.h;
+            }
+            // RIGHT
+            if (xv > 0) {
+                this.xvel = 0;
+                this.x = p.x - this.w;
+            }
+            // LEFT
+            if (xv < 0) {
+                this.xvel = 0;
+                this.x = p.x + p.w;
+            }
+        }
+    };
+};
+var blocks = [];//the array that holds the "block" objects
+blocks.add = function(x,y,w,h,f){ 
+    this.push(new Block(x,y,w,h,f));//push a new block to the array
+};
+blocks.apply = function(player){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update(player);
+    }
+};
+
+var Exit = function(x,y){
+    this.x = x+10;
+    this.y = y;
+    this.w = 60;
+    this.h = 120;
+    this.timer = 0;
+    this.active = color(0, 255, 0);
+    this.grey = color(46, 46, 46);
+    this.color = color(92, 92, 92);
+    this.colors = [this.grey, this.grey, this.grey, this.grey];
+    this.draw = function() {
+        if(cam.view(this)){
+            textFont(createFont(""));
+            pushMatrix();
+            translate(this.x+10,this.y+120);
+            fill(56, 56, 56);
+            strokeWeight(6);
+            stroke(99, 99, 99);
+            rect( -10, -10, 60, -100);
+            strokeWeight(3);
+            rect( -15, -100, 70, -20);
+            noStroke();
+            quad(-20, 0, -10, -10, 50, -10, 60, 0);
+            fill(this.color);
+            quad(-16, -2, -10, -8, -2, -8, -8, -2);
+            quad(56, -2, 50, -8, 42, -8, 48, -2);
+            quad( 18, -2, 18, -8, 2, -8, -4, -2);
+            quad( 22, -2, 22, -8, 38, -8, 44, -2);
+            
+            textAlign(CENTER, CENTER);
+            fill(0, 255, 0, 100);
+            textSize(18);
+            text("EXIT", 20, -110);
+            fill(0, 255, 0, 150);
+            textSize(17);
+            text("EXIT", 20, -110);
+            fill(0, 255, 0);
+            textSize(16);
+            text("EXIT", 20, -110);
+            fill(this.colors[0]);
+            rect(-2.5, -30, 45, 15, 5);
+            fill(this.colors[1]);
+            rect(-2.5, -50, 45, 15, 5);
+            fill(this.colors[2]);
+            rect(-2.5, -70, 45, 15, 5);
+            fill(this.colors[3]);
+            rect(-2.5, -90, 45, 15, 5);
+            fill(this.active);
+            for (var i = 0; i < 80; i += 20) {
+                rect(-12, -i - 30, 3, 6);
+                rect( 48, -i - 30, 3, 6);
+            }
+            popMatrix();
+        }
+    };
+    this.update = function(player){
+        if(player.x>this.x&&player.x+player.w<this.x+this.w&&player.y>this.y&&player.y+player.h<this.y+this.h){
+            this.timer++;
+        }else{
+            this.timer = 0;
+        }
+        if(player.x+player.w>this.x-10&&player.x<this.x+this.w+10&&
+            player.y+player.h>this.y+110&&player.y<this.y+this.h){
+                player.yvel = 0;
+                player.y = this.y+110-player.h;
+                player.falling = false;
+            }
+            if(this.timer>1){
+                this.color = this.active;
+            }else {
+                this.color = color(107);
+            }
+            for(var i in this.colors){
+                if(this.timer>i*30+30){
+                    this.colors[i] = this.active;
+                }else{
+                    this.colors[i] = this.grey;
+                }
+            }
+            if(this.timer>160){
+                this.complete = true;
+            }
+        
+    };
+};
+var exits = [];
+exits.add = function(x,y){
+    this.push( new Exit(x,y));
+};
+exits.apply = function(player){
+    for(var i=0;i<this.length;i++){
+        this[i].update(player);
+        this[i].draw();
+    }
+};
+
+var Robot = function(x,y,xvel,yvel,type){
+    this.x=x; this.y=y;
+    this.rx = x; this.ry = y;
+    this.w=40; this.h=40; 
+    this.xvel = xvel; this.yvel = yvel;
+    this.rvx = xvel; this.rvy = yvel;
+    this.type = type;
+    this.p = [];
+    this.velocity = new PVector(0,0);
+    this.move = true;
+    this.dead = false;
+    this.draw = function() {
+        if(cam.view(this)&&!this.dead){
+            if(frameCount%3===0){ this.p.push([random(40,46),random(360),random(20,40)]);}//add the particles
+            noFill();
+            strokeWeight(0.3);
+            stroke(127, 255, 255);
+            for(var i in this.p){
+                this.d = (frameCount+i*95)*(i%2===1?-1:1);
+                arc(this.x+20,this.y+20,this.p[i][0],this.p[i][0],this.p[i][1]-this.p[i][2],this.p[i][1]);
+            }//draw the particles
+            if(this.p.length>10){this.p.shift();}//remove the particles
+            tint(255,255,255,255);
+            image((type==="boss"?bossRobotImg:robotImg),this.x,this.y,40,40);
+        }
+    };
+    this.update = function(blocks,player){
+        if(this.type!=="boss"&&!this.dead){
+            if(this.move){
+            this.x+=this.xvel;
+            this.y+=this.yvel;
+            }
+            for(var i=0;i<blocks.length;i++){
+                if(collide(this,blocks[i])){
+                    this.xvel*=-1;
+                    this.yvel*=-1;
+                    if(!blocks[i].fixed&&blocks[i].yvel>1){
+                        if(sound&&!this.dead){playSound(sounds.crash);}
+                        this.dead = true;
+                    }
+                }
+            }
+        }
+        else if(this.type==="boss"&&!this.dead){
+            this.direction = PVector.sub(new PVector(player.x,player.y),new PVector(this.x,this.y));
+            this.direction.normalize();
+            this.direction.mult(0.3);
+            this.velocity.add(this.direction);
+            this.velocity.limit(3);
+            
+            if(this.move){
+            this.x+=this.velocity.x;
+            this.applyCollision(blocks,this.velocity.x,0);
+            this.y+=this.velocity.y;
+            this.applyCollision(blocks,0,this.velocity.y);
+            }
+            if(collide(player,exits[0])){
+            this.move = false;
+        }else if(!collide(this,player)&&!this.dead){
+            this.move = true;
+        }
+        }
+        if(collide(this,player)&&!this.dead){
+            if(sound&&!player.dead){playSound(sounds.buzz);}
+            player.dead = true;
+            this.move = false;
+        }else if(!collide(player,exits[0])){
+            this.move = true;
+        }
+        
+    };
+    this.applyCollision=function(obj,velx,vely){
+    for(var i=0; i<obj.length; i++){
+        if(collide(this,obj[i])){ // handle collisions
+            if(vely>0){ this.velocity.y=0; this.y=obj[i].y-this.h; }
+            if(vely<0){ this.velocity.y=0; this.y=obj[i].y+obj[i].h; }
+            if(velx<0){ this.velocity.x=0; this.x=obj[i].x+obj[i].w; }
+            if(velx>0){ this.velocity.x=0; this.x=obj[i].x-this.w; }
+        }
+    }
+};
+};
+var robots = [];
+robots.add = function(x,y,xv,yv,t){
+    this.push( new Robot(x,y,xv,yv,t));
+};
+robots.apply = function(blocks,player){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update(blocks,player);
+    }
+};
+
+var Laser = function(x,y,dir,flash){
+    this.x=x; this.y=y; this.w=10; this.h=10;
+    this.dir = dir; this.flash = flash;
+    this.on = true;
+    this.r = 0;
+    this.draw = function() {
+        if(cam.view(this)){
+            this.on = !this.flash?true:frameCount%200<100?true:false;
+            this.r = random(150);
+            noStroke();
+            for(var i=0;i<5;i++){
+                fill((this.on?color(255, this.r, 0, i * 40):color(255, 0, 0, i * 5)));
+                rect(this.x+i-1,this.y+i-1,this.w-i*2+2,this.h-i*2+2);
+            }
+            switch(this.dir){
+                case "right": base(this.x,this.y+5,90); spark(this.x+this.w,this.y+5,270,this.on,this.r); break;
+                case "left": base(this.x+this.w,this.y+5,270); spark(this.x,this.y+5,90,this.on,this.r); break;
+                case "up": base(this.x+5,this.y+this.h,0); spark(this.x+5,this.y,180,this.on,this.r); break;
+                case "down": base(this.x+5,this.y,180); spark(this.x+5,this.y+this.h,0,this.on,this.r); break;
+            }
+        }
+        
+    };
+    this.update = function(blocks,player){
+        switch(this.dir){
+            case "right":
+                this.w=10000;
+                for(var i in blocks){
+                    if(collide(this,blocks[i])){
+                        this.w=blocks[i].x-this.x;
+                    }
+                }
+            break;
+            case "left":
+                this.x=0;
+                this.w=10000;
+                for(var i in blocks){
+                    if(collide(this,blocks[i])){
+                        this.x=blocks[i].x+blocks[i].w;
+                        this.w=x-this.x;
+                    }
+                }
+            break;
+            case "down":
+                this.h = 10000;
+                for(var i in blocks){
+                    if(collide(this,blocks[i])){
+                        this.h=blocks[i].y-this.y;
+                    }
+                }
+            break;
+            case "up":
+                this.y = 0;
+                this.h = 10000;
+                for(var i in blocks){
+                    if(collide(this,blocks[i])){
+                        this.y=blocks[i].y+blocks[i].h;
+                        this.h=y-this.y;
+                    }
+                }
+            break;
+            
+        }
+        if(collide(this,player)&&this.on){
+            if(sound&&!player.dead){playSound(sounds.zap);}
+            player.dead=true;
+        }
+    };
+    
+};
+var lasers = [];
+lasers.add = function(x,y,dir,f){
+    this.push( new Laser(x,y,dir,f));
+};
+lasers.apply = function(blocks,player){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update(blocks,player);
+    }
+};
+
+var Zapper = function(x,y,side){
+    this.x=x; this.y=y; this.w=40; this.h=40;
+    this.side = side;
+    this.draw = function() {
+        if(cam.view(this)){
+            noStroke();
+            fill(166, 255, 0);
+            rect(this.x,this.y,this.w,this.h);
+        }
+    };
+    this.update = function(player){
+        var w = cos(millis());
+        switch(this.side){
+            case "left": this.w = 10+w; break;
+            case "top": this.h = 10+w; break;
+            case "right": this.w = 10-w; this.x = x+30+w; break;
+            case "bottom": this.h = 10-w; this.y = y+30+w; break;
+        }
+        if(collide(this,player)){
+            if(sound&&!player.dead){playSound(sounds.zap);}
+            player.dead = true;
+        }
+    };
+};
+var zappers = [];
+zappers.add = function(x,y,side){
+    this.push( new Zapper(x,y,side));
+};
+zappers.apply = function(player){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update(player);
+    }
+};
+
+var Checkmark = function(x,y){
+    this.x=x+10; this.y=y; this.w=60; this.h=120;
+    this.p = []; 
+    this.colors = [color(92),color(0, 255, 0)];
+    this.active = false;
+    this.draw = function() {
+        if(cam.view(this)){
+            this.color = (this.active?this.colors[1]:this.colors[0]);
+            pushMatrix();
+            translate(this.x+10,this.y+120);
+            if(this.active){
+                pushMatrix();
+                translate(20,-40+cos(frameCount)*5);
+                scale(0.5/sF);
+                Alien(0,0,"right");
+                popMatrix();
+                stroke(1, 255, 0,25);
+                strokeWeight(7);
+                for(var i=0;i<40;i++){
+        line(20+cos(i*360/40+frameCount)*30,-66+cos(i*360/40+frameCount+90)*5,20+cos(i*360/40+frameCount)*25,-10);
+    }
+            }
+            fill(56, 56, 56);
+            noStroke();
+            quad(-20, 0, -10, -10, 50, -10, 60, 0);
+            fill(this.color);
+            quad(-16, -2, -10, -8, -2, -8, -8, -2);
+            quad(56, -2, 50, -8, 42, -8, 48, -2);
+            quad( 18, -2, 18, -8, 2, -8, -4, -2);
+            quad( 22, -2, 22, -8, 38, -8, 44, -2);
+            popMatrix();
+            
+        }
+    };
+    this.update = function(player){
+        if(collide(this,player)){
+            respawnX = this.x+10;
+            respawnY = this.y+20;
+            saveG = gravity;
+        }
+        if(respawnX===this.x+10&&respawnY === this.y+20){
+            if(sound&&!this.active){playSound(sounds.save);}
+            this.active = true;
+        }else{
+            this.active = false;
+        }
+        //platform
+        if(player.x+player.w>this.x-10&&player.x<this.x+this.w+10&&
+            player.y+player.h>this.y+110&&player.y<this.y+this.h){
+                player.yvel = 0;
+                player.y = this.y+110-player.h;
+                player.falling = false;
+            }
+    };
+};
+var checkmarks = [];
+checkmarks.add = function(x, y) {
+    checkmarks.push(new Checkmark(x, y));
+};
+checkmarks.apply = function(player) {
+    for (var i = 0; i < this.length; i++) {
+        this[i].draw();
+        this[i].update(player);
+    }
+};
+
+var Sign = function(x,y,type){
+    this.x=x; this.y=y; this.w=40; this.h=40;
+    this.type = type;
+    this.message = "";
+    this.running = false;
+    this.rectSize = 0;
+    this.active = false;
+    this.counter = 0;
+    this.draw = function() {
+        if(cam.view(this)){
+            switch(this.type){
+                case "warning":
+                pushMatrix();
+                translate(this.x+20,this.y+20);
+                stroke(255, 0, 0);
+                strokeWeight(4);
+                fill(255);
+                beginShape();
+                vertex(3,-17);
+                vertex(17,7);
+                bezierVertex(17,7,20,13,14,13);
+                vertex(14,13);
+                vertex(-14,13);
+                bezierVertex(-14,13,-20,13,-17,7);
+                vertex(-3,-17);
+                bezierVertex(-3,-17,0,-20,3,-17);
+                endShape();
+                textSize(30);
+                fill(0);
+                textAlign(CENTER,CENTER);
+                textFont(createFont(""));
+                text("!",0,-1);
+                popMatrix();
+            break;
+            case "info":
+                textSize(55);
+                textFont(createFont(""));
+                fill(255, 255, 255,200+cos(frameCount*2)*100);
+                textAlign(LEFT,BASELINE);
+                text("?",this.x+6,this.y+40+cos(frameCount)*3);
+            break;
+            }
+            strokeWeight(5);
+            stroke(55, 142, 153, 35);
+            fill(130, 180, 199, 150);
+            if (this.running) {
+                rect(cam.x-200+80, cam.y-200+35, this.rectSize, this.rectSize / 3);
+            }
+            strokeWeight(1);
+            if (frameCount%2===0) {
+                for (var i = 0; i < this.rectSize; i++) {
+                    var r = random(80, 80 + this.rectSize);
+                    stroke(random(15, 20), random(70, 100), 160, random(10, 30));
+                    line(cam.x-200+r, cam.y-200+35, cam.x-200+r, cam.y-200+35 + this.rectSize / 3);
+                }
+            }
+            if(this.active){
+            fill(255);
+            textSize(13);
+            textAlign(LEFT,TOP);
+            textFont(createFont("monospace"));
+            typeWriter(this.counter,this.message,cam.x-200+90,cam.y-200+40);
+            }
+        }
+    };
+    this.update = function(player){
+        if(collide(this,player)){
+            this.running = true;
+            if(this.rectSize<240){
+                this.rectSize+=10;
+            }
+        }else{
+            this.running = false;
+            this.rectSize=0;
+            this.active=false;
+            this.counter = 0;
+        }
+        if(this.rectSize>=240){
+            this.active = true;
+            this.counter++;
+        }
+        
+    };
+};
+var signs = [];
+signs.add = function(x, y,type) {
+    this.push(new Sign(x, y,type));
+};
+signs.apply = function(player) {
+    for (var i = 0; i < this.length; i++) {
+        this[i].draw();
+        this[i].update(player);
+    }
+};
+
+var StarDust = function(x,y){
+    this.x=x+13.5; this.y=y+13.5; this.w=13; this.h=13;
+    this.collected = false; this.random = random(1,3);
+    this.draw = function() {
+        if(cam.view(this)&&!this.collected){
+        fill(100,255,0,200);
+        strokeWeight(5);
+        stroke(50,255,0,80+cos(frameCount)*20);
+        this.x+=cos(frameCount*this.random)/15.2;
+        this.y+=sin(frameCount*this.random*1.2)/15;
+        ellipse(this.x+this.w/2,this.y+this.h/2,this.w,this.h);
+        }
+    };
+    this.update = function(player,bar){
+        if(collide(this,player)&&!this.collected){
+            if(sound){playSound(sounds.collect);}
+            this.collected = true;
+            playerSaved = true;
+            score++;
+            bar.scale = 1.8;
+        }
+    };
+};
+var stardust = [];
+stardust.add = function(x,y){
+    this.push( new StarDust(x,y));
+};
+stardust.apply = function(player,bar){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update(player,bar);
+    }
+};
+
+
+var Door = function(x,y,id){
+    this.x=x; this.y=y; this.w=80; this.h=10;
+    this.id = id; this.open = false;
+    this.draw = function() {
+        if(cam.view(this)){
+        fill(125, 125, 125);
+        rect(this.x,this.y,this.w,this.h,2);
+        stroke(71, 71, 71);
+        strokeWeight(1);
+        for(var i=this.w;i>0;i-=20){
+            line(this.x+i,this.y+2,this.x+i,this.y+this.h-2);
+        }
+        fill(64, 64, 64);
+        rect(this.x-1,this.y-1,4,12,1);
+        }
+    };
+    this.update = function(){
+        for(var i=0;i<blocks.length;i++){
+            if(blocks[i].x===this.x&&blocks[i].y===this.y){
+                blocks[i].w=this.w-1; blocks[i].h=this.h;
+            }
+        }
+        if(this.open&&this.w>0){
+            this.w-=0.50;
+        }
+        if(this.open&&this.w>15){
+            playerMove = false;
+            cam.follow(this);
+        }
+    };
+};
+var doors = [];
+doors.add = function(x,y,id){
+    this.push(new Door(x,y,id));
+};
+doors.apply = function(){
+    for(var i=0;i<this.length;i++){
+        this[i].update();
+    }
+};
+
+var Lever = function(x,y,id){
+    this.x=x+5; this.y=y; this.w=30; this.h=20;
+    this.id = id; this.used = false;
+    this.draw = function() {
+        if(cam.view(this)){
+            stroke(54);
+        strokeWeight(1.5);
+        fill(this.used?color(0,255,0):color(255,0,0));
+        if(this.used){
+        line(this.x+15, this.y+20,this.x+25,this.y+0);
+        stroke(0, 173, 6);
+        ellipse(this.x+25, this.y,10,10);
+        }else{
+        line(this.x+15, this.y+20,this.x+5,this.y+0);
+        stroke(138, 0, 0);
+        ellipse(this.x+5, this.y,10,10);
+        }
+        fill(70);
+        stroke(54);
+        rect(this.x,this.y+15,30,5,3);
+        arc(this.x+15,this.y+20,30,15,180,360);
+        }
+    };
+    this.update = function(player){
+        if(collide(this,player)){
+            if(!this.used){
+                for(var i =0;i<doors.length;i++){
+                    if(doors[i].id === this.id){
+                        if(sound&&!doors[i].open){playSound(sounds.open);}
+                        doors[i].open = true;
+                    }
+                }
+                this.used = true;
+            }
+        }
+    };
+};
+var levers = [];
+levers.add = function(x,y,id){
+    this.push(new Lever(x,y,id));
+};
+levers.apply = function(player){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update(player);
+    }
+};
+
+var GravitySwitch = function(x,y){
+    this.x=x; this.y=y; this.w=5; this.h=1000;
+    this.used = false; this.interact = false;
+    this.flash = [this.x,this.y,this.w,this.h];
+    this.draw = function() {
+        if(cam.view(this)&&!this.used){
+        noStroke();
+        fill(0,60,255,150);
+        rect(this.x,this.y,this.w,this.h);
+        if(!this.used){
+        fill(56, 56, 56);
+        triangle(this.x-4,this.y,this.x+3,this.y+7,this.x+9,this.y);
+        triangle(this.x-4,this.y+this.h,this.x+3,this.y+this.h-7,this.x+9,this.y+this.h);
+        }
+        }
+        if(this.used){
+            noStroke();
+            fill(this.b,this.g,this.r,this.t);
+            rect(this.flash[0],this.flash[1],this.flash[2],this.flash[3]);
+        }
+    };
+    this.update = function(player,blocks){
+        if(!this.used&&!this.interact){
+            this.flash = [this.x,this.y,this.w,this.h];
+            this.r = 255; this.g = 60; this.b=0; this.t = 255;
+        }
+        if(this.used&&!this.interact){
+            this.flash[0]/=1.3;
+            this.flash[2]*=2.6;
+            this.flash[1]/=1.2;
+            this.flash[3]*=2.4;
+            this.g+=15;
+            this.b+=15;
+            this.t-=5;
+            if(this.t<=0){
+                this.interact = true;
+            }
+        }
+        if(!this.used){
+        this.h=1000;
+        for(var i=0;i<blocks.length;i++){
+            if(collide(this,blocks[i])){
+                this.h=blocks[i].y-this.y;
+            }
+        }
+        if(collide(this,player)&&!this.used){
+            gravity = !gravity;
+            if(sound){playSound(sounds.gravity);}
+            this.used = true;
+        }
+        }
+    };
+};
+var gravityS = [];
+gravityS.add = function(x,y){
+    this.push(new GravitySwitch(x,y));
+};
+gravityS.apply = function(player,blocks){
+    for(var i=0;i<this.length;i++){
+        this[i].update(player,blocks);
+        this[i].draw();
+    }
+};
+
+var BigRedButton = function(x,y){
+    this.x=x; this.y=y; this.w=40; this.h=30;
+    this.dx = x+80; this.dy = y-125; this.dh = 80;
+    this.draw = function() {
+        strokeWeight(2);
+        stroke(200,0,0);
+        fill(255, 0, 0);
+        rect(this.x,this.y,this.w,this.h,5);
+        stroke(80);
+        fill(102, 102, 102);
+        rect(x+30,this.y-5, 10, 40,5);
+        stroke(89, 89, 89);
+        fill(140);
+        rect(this.dx,this.dy,10,this.dh,1);
+        for(var i=this.dh;i>0;i-=20){
+            line(this.dx+2,this.dy+i,this.dx+8,this.dy+i);
+        }
+        fill(80);
+        rect(this.dx-1,this.dy,13,3);
+        
+    };
+    this.update = function(player){
+        if(collide(this,player)&&player.xvel>0&&this.x<x+20){
+            player.xvel = 1;
+            this.w-=3;
+            this.x+=3;
+        }
+        for(var i=0;i<blocks.length;i++){
+            if(blocks[i].x===this.x&&blocks[i].y===this.y){
+                blocks[i].x=this.x+3; blocks[i].w=this.w;
+            }
+            if(blocks[i].x===this.dx&&blocks[i].y===this.dy){
+                blocks[i].h=this.dh;
+            }
+        }
+        
+        if(this.x>=x+20){
+            this.opening = true;
+        }
+        if(this.opening&&this.dh>=1){
+            this.dh--;
+        }
+        if(this.dh<=10){
+            alarm = true;
+        }
+    };
+};
+var BRButtons = [];
+BRButtons.add = function(x,y){
+    this.push( new BigRedButton(x,y));
+};
+BRButtons.apply = function(player){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update(player);
+    }
+};
+var player = new Player(200,100);//the player object
+
+// manage objects
+var objects = [blocks, exits, robots, lasers, zappers, checkmarks, signs, stardust, doors, levers, gravityS, BRButtons];
+var scoreBar = new ScoreBar();
+// remove objects
+objects.remove = function() {
+    for (var i = 0; i < objects.length; i++) {
+        for (var j = 0; j < objects[i].length; j++) {
+            objects[i].splice(j, objects[i].length);
+        }
+    }
+};
+var loadMap = function(){
+    gravity = true;
+    saveG = gravity;
+    objects.remove();
+    playerSaved = false;
+    score = 0;
+    levels[lvl].time = 0;
+    alarm = false;
+    alarmTime = 150;
+    for(var y=0;y<levels[lvl].level.length;y++){
+        for(var x=0;x<levels[lvl].level[y].length;x++){
+            var sx = x*40; var sy = y*40;
+            switch(levels[lvl].level[y][x]){
+                case "b": blocks.add(sx,sy,40,40,true); break;
+                case ".": blocks.add(sx,sy+39,40,1,true); break;
+                case "'": blocks.add(sx,sy,40,1,true); break;
+                case "P": player = new Player(sx,sy); respawnX = sx; respawnY = sy; break;
+                case "c": blocks.add(sx,sy,40,40,false); break;
+                case "@": exits.add(sx,sy-80); break;
+                case "~": checkmarks.add(sx,sy-80); break;
+                case "!": signs.add(sx,sy,"warning"); break;
+                case "?": signs.add(sx,sy,"info"); break;
+                case "$": stardust.add(sx,sy); break;
+                
+                case "h": robots.add(sx,sy,2,0,"normal"); break;
+                case "H": robots.add(sx,sy,-2,0,"normal"); break;
+                case "r": robots.add(sx,sy,0,2,"normal"); break;
+                case "R": robots.add(sx,sy,0,-2,"normal"); break;
+                case "O": robots.add(sx,sy,0,0,"boss"); break;
+                
+                case ">": lasers.add(sx,sy+15,"right",false); break;
+                case "<": lasers.add(sx+40,sy+15,"left",false); break;
+                case "^": lasers.add(sx+15,sy+40,"up",false); break;
+                case "v": lasers.add(sx+15,sy,"down",false); break;
+                case "1": lasers.add(sx,sy+15,"right",true); break;
+                case "2": lasers.add(sx+40,sy+15,"left",true); break;
+                case "3": lasers.add(sx+15,sy+40,"up",true); break;
+                case "4": lasers.add(sx+15,sy,"down",true); break;
+                
+                case "]": zappers.add(sx,sy,"right"); break;
+                case "[": zappers.add(sx,sy,"left"); break;
+                case "_": zappers.add(sx,sy,"bottom"); break;
+                case "-": zappers.add(sx,sy,"top"); break;
+                //doors and levers with their id
+                case "x": levers.add(sx,sy+20,1); break;
+                case "y": levers.add(sx,sy+20,2); break;
+                case "z": levers.add(sx,sy+20,3); break;
+                
+                case "X": doors.add(sx,sy,1); blocks.add(sx,sy,80,10,true); break;
+                case "Y": doors.add(sx,sy,2); blocks.add(sx,sy,80,10,true); break;
+                case "Z": doors.add(sx,sy,3); blocks.add(sx,sy,80,10,true); break;
+                //Gravity switch
+                case "G": gravityS.add(sx+17.5,sy); break;
+                case "B": BRButtons.add(sx,sy+5); blocks.add(sx,sy+5,40,30,true); blocks.add(sx+80,sy-120,10,80,true); break;
+                
+            }
+        }
+        level_h = levels[lvl].level.length*40;
+        level_w = levels[lvl].level[y].length*40;
+    }
+    for(var i=0;i<signs.length;i++){
+        signs[i].message = levels[lvl].messages[i];
+    }
+    levels[lvl].totalLevelScore = stardust.length;
+    cam = new Camera(player.x,player.y);
+};
+
+var updateStats = function(){
+    levels[lvl].score=score;//update the score
+    if(levels[lvl].time<levels[lvl].bestTime&&levels[lvl].time!==0){ levels[lvl].bestTime = levels[lvl].time; }
+    if(levels[lvl].totalLevelScore>0){
+    if(levels[lvl].score>=levels[lvl].totalLevelScore/100*40){ levels[lvl].stars = 1;}//add first star
+    if(levels[lvl].score>=levels[lvl].totalLevelScore/100*75){ levels[lvl].stars = 2;}//second star
+    if(levels[lvl].score>=levels[lvl].totalLevelScore/100*100){ levels[lvl].stars = 3;}//third
+    }
+};
+var levelStats = function(){
+    if(stats){slideDown+=20;}else{slideDown-=40;}
+    slideDown = constrain(slideDown,-600,400);
+    pushMatrix();
+    translate(0,-423+slideDown);
+    if(slideDown>0){
+    strokeWeight(5);
+    stroke(20, 20, 20);
+    fill(33, 32, 32);
+    beginShape();
+    {
+    vertex(40,60);
+    vertex(80,60);
+    vertex(100,80);
+    vertex(160,80);
+    vertex(180,60);
+    vertex(220,60);
+    vertex(240,80);
+    vertex(300,80);
+    vertex(320,60);
+    vertex(360,60);
+    vertex(380,80);
+    vertex(380,100);
+    vertex(360,120);
+    vertex(360,160);
+    vertex(380,180);
+    vertex(380,240);
+    vertex(360,260);
+    vertex(360,300);
+    vertex(380,320);
+    vertex(380,340);
+    vertex(360,360);
+    vertex(320,360);
+    vertex(300,340);
+    vertex(240,340);
+    vertex(220,360);
+    vertex(180,360);
+    vertex(160,340);
+    vertex(100,340);
+    vertex(80,360);
+    vertex(40,360);
+    vertex(20,340);
+    vertex(20,320);
+    vertex(40,300);
+    vertex(40,260);
+    vertex(20,240);
+    vertex(20,180);
+    vertex(40,160);
+    vertex(40,120);
+    vertex(20,100);
+    vertex(20,80);
+    }
+    endShape(CLOSE);
+    fill(0, 0, 0);
+    stroke(46, 46, 46);
+    rect(60,100,280,220);
+    
+    if(button(205,235,120,30,"continue",22,-423+slideDown)){
+        if(lvl===levels.length-1){
+            toEnding = true;
+        }else{
+        lvl++;
+        remove = true;
+        }
+    }
+    if(button(75,235,120,30,"Replay",22,-423+slideDown)){
+        remove = true;
+    }
+    if(button(80,275,240,35,"Level Select",22,-423+slideDown)){
+        toSelect = true;
+    }
+    fill(0, 255, 9);
+    textSize(60);
+    pushMatrix();
+    scale(0.6,1);
+    
+    textAlign(LEFT,BASELINE);
+    text("TIME:"+levels[lvl].time,125,225);
+    textSize(20);
+    text("Best time:\n"+levels[lvl].bestTime,430,200);
+    popMatrix();
+    tint(100,255,0,255);
+    for(var i=0;i<levels[lvl].stars;i++){
+        image(graphics,98+i*70,86,70,105);
+    }
+    tint(255,255,255,255);
+    }
+    popMatrix();
+};//the stats page
+var curtains = function(){
+    if(!stats){
+    if(closing){close+=30;}else{close-=10;}
+    if(close>255&&!statsOn){
+        stats=true; 
+        statsOn = true; 
+        if(!pause){
+            updateStats();
+            
+        }
+    }
+    }
+    if(close<0&&statsOn){
+        statsOn = false;
+    }
+    close = constrain(close,0,250);
+    if(close>0){
+    fill(80);
+    strokeWeight(8);
+    stroke(50);
+    pushMatrix();
+    translate(close-250,0);
+    beginShape();
+    vertex(-10,-10);
+    vertex(250,-10);
+    bezierVertex(250,145,250,147.5,245,155);
+    bezierVertex(155,245,150,247.5,150,255);
+    vertex(150,410);
+    vertex(-10,410);
+    endShape(CLOSE);
+    strokeWeight(2);
+    stroke(0, 150, 0);
+    for(var i=32;i<150;i+=65){
+        line(i,0,i,400);
+        Hex(i,130+cos(i)*200,50,20,90);
+    }
+    line(165,0,165,204);
+    stroke(0,120,0);
+    line(230,0,230,138);
+    line(230,140,130,240);
+    line(130,240,130,400);
+    
+    popMatrix();
+    stroke(50);
+    pushMatrix();
+    translate(250-close,0);
+    beginShape();
+    vertex(410,-10);
+    vertex(250,-10);
+    bezierVertex(250,145,250,147.5,245,155);
+    bezierVertex(155,245,150,247.5,150,255);
+    vertex(150,410);
+    vertex(410,410);
+    endShape(CLOSE);
+    strokeWeight(2);
+    stroke(0,120,0);
+    for(var i=32;i<150;i+=65){
+        line(268+i,0,268+i,400);
+        Hex(268+i,74+cos(i)*200,50,20,90);
+    }
+    line(228,204,228,400);
+    stroke(0,150,0);
+    line(270,0,270,158);
+    line(270,160,170,260);
+    line(170,260,170,400);
+    stroke(8, 48, 0);
+    popMatrix();
+    }
+};//these curtains close after the level is finished and triggers the stats
+var levelButton = function(x,y,lvls,yo){
+    if(button(x,y,80,80,"",0,0)){}
+    fill(0,255,0);
+    textAlign(CENTER,CENTER);
+    textSize(16);
+    textFont(createFont("Arial Black"));
+    text("Level "+(lvls+1),x+40,y+92);
+    if(!levels[lvls].lock){
+    pushMatrix();
+    fill(0);
+    translate(x+40,y+38);
+    for (var i = 0; i < 3 - levels[lvls].stars; i++) {
+        pushMatrix();
+        translate(0, 10);
+        rotate(-102 - i * 52);
+        tint(0, 0, 0, 100);
+        image(graphics, 0, 0, 30, 51);
+        popMatrix();
+    }
+    for (var i = 0; i < levels[lvls].stars; i++) {
+        pushMatrix();
+        translate(0, 10);
+        rotate(-206 + i * 52);
+        tint(120,255,0, 255);
+        image(graphics, 0, 0, 30,51);
+        popMatrix();
+    }
+    popMatrix();
+    textSize(12);
+    text("Best Time:\n"+(levels[lvls].bestTime>1000?0:levels[lvls].bestTime),x+40,y+61);
+    }else{
+        pushMatrix();
+        translate(x+40,y+40);
+        scale(mouseX>x&&mouseY>y+yo&&mouseX<x+80&&mouseY<y+80+yo?0.93:0.8);
+        noFill();
+        strokeWeight(7);
+        stroke(107, 105, 107);
+        arc(0, -12, 40, 50, 180, 360);
+            strokeWeight(3);
+            stroke(122, 122, 122);
+            arc(0, -12, 40, 50, 180, 360);
+            stroke(99, 99, 99);
+            strokeWeight(3);
+            fill(110, 110, 110);
+            rect(-30, -10, 60, 40, 3);
+            fill(36, 36, 36);
+            noStroke();
+            ellipse(0, 6, 15, 15);
+            triangle(0, 0, -8, 25, 8, 25);
+        popMatrix();
+    }
+    if(mouseX>x&&mouseY>y+yo&&mouseX<x+80&&mouseY<y+yo+80){
+        cursor(HAND);
+        if(!levels[lvls].lock&&click){
+            gameState = "play";
+            lvl = lvls;
+            loadMap();
+            selectToGame = true;
+        }
+    }
+};
+var levelSelect = function(){
+    if(Select){selectDown+=20;}else{selectDown-=40;}
+    selectDown = constrain(selectDown,-400,400);
+    if(selectDown>0){
+    pushMatrix();
+    translate(0,-400+selectDown);
+        fill(0);
+        rect(15,30,370,350);
+        
+        for(var x=0;x<levels.length;x++){
+            for(var y=0;y<levels.length;y++){
+                if(levels[x+(y*4)]&&x<4){
+                    levelButton(25+x*90,80+y*102,x+y*4,-400+selectDown);
+                }
+            }
+        }
+        if(button(25,40,100,30,"← Back",22,-400+selectDown)){
+            toMain = true;
+        }
+        if(button(25+90*3,80+204,80,80,"",11,-400+selectDown)){
+            toEnding = true;
+        }
+        textFont(createFont("arial black"));
+        textSize(17);
+        text("Ending",335,304);
+        textSize(12);
+        text("Play!",335,334);
+    popMatrix();
+    }
+};
+var pauseB = function(){
+    if(pauseButtons){ pauseY+=20;}else{pauseY-=40;}
+    pauseY = constrain(pauseY,-800,0);
+    pushMatrix();
+    translate(0,pauseY);
+    fill(20, 20, 20);
+    stroke(41, 41, 41);
+    strokeWeight(8);
+    rect(30,30,340,340);
+    if(button(50,242,300,60,"Back to Game",35,pauseY)){
+        pauseToGame = true;
+    }
+    if(button(45,315,150,40,"Level Select",20,pauseY)){
+        pauseToSelect = true;
+    }
+    if(button(205,315,150,40,"Restart Level",20,pauseY)){
+        loadMap();
+        pauseToGame = true;
+    }
+    pushMatrix();
+    translate(150,137);
+    scale(3);
+    Alien(0,0,"none");
+    popMatrix();
+    
+    fill(100,100,100,120);
+    textSize(104);
+    text("▌▌",254,147);
+    fill(100,100,100);
+    textSize(100);
+    text("▌▌",254,147);
+    popMatrix();
+};
+
+
+var draw = function() {
+    cursor(ARROW);//reset the cursor
+    if(gameState==="play"&&!pause){
+    if(!exits[0].complete){ 
+        if(sec!==second()){
+            if(alarm){alarmTime--;}
+        levels[lvl].time++;
+        sec = second();
+        }
+    }
+    if(alarmTime<0){blowUp=true;}
+    if(exits[0].complete&&!closing){closing = true;}
+var xo = 0;
+stroke(179, 175, 179);
+fill(196, 196, 196);
+for(var y=-cam.y%(115.47005*1.5);y<450;y+=100 * sqrt(3) / 2){//the background
+    for(var x = -cam.x%(100)+xo % 2*50;x<450;x+=100){
+        fill(170+cos(x+cam.x)*10);
+        stroke(160+cos(x+cam.x)*10);
+        strokeWeight(cos((y+cam.y+x+cam.x))*5);
+        beginShape();
+        for(var i=-30;i<360;i+=360/6){
+            vertex(x+(cos(i)*115.47/2),y+(sin(i)*115.47/2));
+        }
+        endShape();
+    }
+    xo++;
+}
+    pushMatrix();
+    if(playerMove){
+    cam.follow(player);
+    }
+    playerMove = true;
+    doors.apply();
+    blocks.apply(player);
+    
+    for(var i=0;i<doors.length;i++){
+        doors[i].draw();
+    }
+    
+    levers.apply(player);
+    BRButtons.apply(player);
+    exits.apply(player);
+    zappers.apply(player);
+    lasers.apply(blocks,player);
+    gravityS.apply(player,blocks);
+    robots.apply(blocks,player);
+    checkmarks.apply(player);
+    signs.apply(player);
+    stardust.apply(player,scoreBar);
+    
+    if(blowUp){
+        player.dead = true;
+        background(255, random(10,220), 0);
+    }
+    
+    player.update(blocks);
+    player.draw();
+    popMatrix();
+    
+    scoreBar.draw(stardust);
+    
+    if(alarm&&!blowUp){
+        noFill();            
+    strokeWeight(10);
+    for(var i=0;i<100;i+=10){
+        stroke(255, 0, 0,100-i);
+        var z = -20+i+cos(frameCount*20)*20;
+        rect(z,z,400-z*2,400-z*2);
+    }
+    fill(255, 0, 0,110);
+    textSize(40);
+    textAlign(CENTER,CENTER);
+    textFont(createFont("monospace"));
+    text("Self-destructing",215,375);
+    textSize(80);
+    fill(255, 0, 0,50);
+    text(floor(alarmTime/60)+":"+alarmTime%60,200,320);
+    }
+    
+    fill(0);
+    textSize(15);
+    textAlign(CENTER,CENTER);
+    
+    if(button(370,2.5,25,25,"||",15,0)){
+        pause = true;
+        gameToPause = true;
+    }
+    if(sound){
+        if(button(2.5,400-37.5,35,35,"🔇",35,0)){
+        sound = false;
+        }
+    }else{
+        if(button(2.5,400-37.5,35,35,"🔊",35,0)){
+        sound = true;
+        }
+    }
+    noFill();
+    strokeWeight(2);
+    stroke(255, 255, 255);
+    rect(370,2.5,25,25,4);
+    rect(2.5,400-37.5,35,35,4);
+    
+    if(player.reset){
+        for(var i=0;i<robots.length;i++){
+            robots[i].x = robots[i].rx; robots[i].y=robots[i].ry;
+            robots[i].xvel = robots[i].rvx; robots[i].yvel = robots[i].rvy;
+        }
+        for(var i=0;i<gravityS.length;i++){
+            gravityS[i].used = false;
+            gravityS[i].interact = false;
+        }
+        player = new Player(respawnX,respawnY);
+        sF = 0.5;
+        gravity = saveG;
+        if(blowUp){
+            blowUp = false;
+            loadMap();
+        }
+        if(alarm&&!playerSaved){
+            loadMap();
+        }
+    }
+    
+    }else
+    if(gameState==="menu"){
+        background(0, 6, 125);
+        fill(255);
+        strokeWeight(5);
+        stroke(255,255,255,100);
+        for(var i=0;i<space.length;i++){
+            ellipse(space[i][0],space[i][1],space[i][2],space[i][2]);
+            space[i][0]+=3;
+            if(space[i][0]>410){
+                space[i][0]=0;
+            }
+        }
+        pushMatrix();
+        translate(22,32);
+        scale(0.92,1.09);
+        Escape(0,-19);
+        pushMatrix();
+        scale(1,0.8);
+        Plan(-10,-40);
+        popMatrix();
+        popMatrix();
+        fill(40);
+        stroke(20, 20, 20);
+        strokeWeight(10);
+        beginShape();
+        vertex(0,400);
+        vertex(0,320);
+        vertex(80,320);
+        vertex(100,260);
+        vertex(300,260);
+        vertex(320,320);
+        vertex(380,320);
+        vertex(380,40);
+        vertex(360,20);
+        vertex(40,20);
+        vertex(20,40);
+        vertex(20,320);
+        vertex(0,320);
+        vertex(0,0);
+        vertex(400,0);
+        vertex(400,400);
+        vertex(0,400);
+        endShape(CLOSE);
+        if (button(200 - 90, 273, 180, 50, "PLAY!", 50,0)) {
+            lvl = 0;
+            startGame = true;
+        }
+        if (button(20, 340, 170, 40, "Level Select", 23,0)){
+            toSelect = true;
+        }
+        if (button(210, 340, 170, 40, "Play Story",23.1,0)){
+            animation = new Animation();
+            gameState= "story";
+        }
+    }else
+    if(gameState==="story"&&animation){
+        animation.draw();
+        if(click){
+            gameState="menu";
+            animation = false;
+        }
+    }else 
+    if(gameState==="ending"&&ending){
+        ending.draw();
+        if(click){
+            gameState="menu";
+            ending = false;
+        }
+    }else
+    if(gameState ==="logo"){
+        background(0);
+        image(logo,0,-35);
+        textAlign(CENTER,CENTER);
+        textSize(50);
+        textFont(createFont("Microsoft JhengHei UI Light"));
+        text("Presents...",200,360);
+        fill(0,0,0,frameCount*2-200);
+        rect(0,0,400,400);
+        if(frameCount>240){
+            gameState = "menu";
+        }
+    }
+    
+    curtains();
+    levelStats();
+    
+    pauseB();
+    levelSelect();
+    if(remove){
+    stats = false;
+    if(slideDown<=0){
+        closing = false;
+        loadMap();
+        remove = false;
+    }
+    }
+    if(startGame){
+        pause = false;
+        stats = false;
+        if(close<10){closing = true;}
+        if(close>=250){waitTime++;}
+        if(waitTime>30){closing = false; gameState = "play"; loadMap(); startGame = false; waitTime = 0;}
+    }
+    if(toSelect){
+        stats = false;
+        closing = true;
+        if(close>=250){Select = true; toSelect = false;}
+    }
+    if(toMain){
+        Select = false;
+        if(selectDown<=-400){ closing = false; toMain = false; gameState = "menu"; }
+    }
+    if(selectToGame){
+        Select = false;
+        if(selectDown<=-400){ selectToGame = false; closing = false; }
+    }
+    if(gameToPause){
+        closing = true; stats = false;
+        if(close>=250){ pauseButtons = true; gameToPause = false;}
+    }
+    if(pauseToGame){
+        pauseButtons = false;
+        if(pauseY<=-800){ pause = false; closing = false; pauseToGame = false; }
+    }
+    if(pauseToSelect){
+        pauseButtons = false;
+        if(pauseY<=-800){ Select = true; pauseToSelect = false; pause = false; gameState = "menu"; objects.remove();}
+    }
+    if(toEnding){
+        Select=false;
+        stats = false;
+        if(selectDown<=-400&&slideDown<=-400){closing = false; ending = new Ending(); gameState = "ending"; toEnding = false;}
+    }
+    
+    click = false;
+};
+
+keyPressed = function(){ keys[keyCode]=true; };
+keyReleased = function(){ 
+    keys[keyCode]=false; 
+    if(key.toString()==="r"&&gameState === "play"){
+        loadMap(); 
+        sF = 0.5;
+    }
+    if(key.toString()==="p"&&gameState === "play"){
+        gameToPause = true;
+    }
+        
+};
