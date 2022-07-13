@@ -1,6 +1,18 @@
-body {
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Project: First Website</title>
+        <meta charset="utf-8">
+        <style>
+            body {
             background-color:rgb(255, 255, 255);
 }
 .titles {
             color:blue;
 }
+</style>
+</head>
+    <body>
+
+</body>
+</html>
