@@ -7,19 +7,30 @@
         .header {
             color: white;
             background-color: black;
-            height: 8%;
+            height: 7%;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
+            z-index: 1;
+            }
+            #header-logo {
+                margin-top: 20px;
+                margin-left: 80px;
+                width: 150px;
+                position: fixed;
+                z-index: 2;
+            }
+            h1.titles {
+                margin-top: 80px    
             }
         </style>
     </head>
     <body>
         <div class = "header">
-           <img style = "margin-top: 20px margin-left: 60px; width: 70px;" src = "https://www.ulivchabad.org/wp-content/uploads/2014/05/ChabadLiverpoolUnilogo-01.jpg" alt = "Chabad at Liverpool Universities Logo"> 
+           <img id = "header-logo" src = "https://www.ulivchabad.org/wp-content/uploads/2014/05/ChabadLiverpoolUnilogo-01.jpg" alt = "Chabad at Liverpool Universities Logo"> 
         </div>
-        <h1 style = "margin-top: 200px;" class = "titles">Yudi's Recipe Book</h1>
+        <h1 class = "titles">Yudi's Recipe Book</h1>
         
         <h2 class = "titles">Contents:</h2>
         
