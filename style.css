@@ -1,18 +1,217 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Project: First Website</title>
-        <meta charset="utf-8">
-        <style>
-            body {
-            background-color:rgb(255, 255, 255);
-}
-.titles {
-            color:blue;
-}
-</style>
-</head>
-    <body>
+/*this is just pure css*/
 
-</body>
-</html>
+
+html {
+            scroll-padding-top: 120px;
+            scroll-behavior: smooth;
+            }
+         h1.title {
+             margin-top: 120px;
+            }
+        .header {
+            color: white;
+            background-color: black;
+            height: 20%;
+            /*I edited this so it looks better and fits better*/
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index:1;
+            }
+        #header-logo {
+            margin-left: 80px;
+            width: 150px;
+            position: fixed;
+            }
+        .home {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-left: 280px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;     
+            }
+        .home:hover {
+            color: black;
+            background-color: white;
+            }
+        .contact-us {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .contact-us:hover {
+            color: black;
+            background-color: white;
+            }
+        .about-us {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .about-us:hover {
+            color: black;
+            background-color: white;
+            }
+        .shabbat {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .shabbat:hover {
+            color: black;
+            background-color: white;
+            }
+        .classes {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .classes:hover {
+            color: black;
+            background-color: white;
+            }
+        .programmes {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .programmes:hover {
+            color: black;
+            background-color: white;
+            }
+        .events {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .events:hover {
+            color: black;
+            background-color: white;
+            }
+        .gallery {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .gallery:hover {
+            color: black;
+            background-color: white;
+            }
+        .donate {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .donate:hover {
+            color: black;
+            background-color: white;
+            }
+        .visitor-information {
+            text-align: center;
+            font-size: 30px;
+            float: right;
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            color: white;
+            text-decoration-line: none;
+            }
+        .visitor-information:hover {
+            color: black;
+            background-color: white;
+            }
+        .liverpool-waterfront {
+            width: 100%;
+            height: 50vh;
+            top: 0;
+            left: 0;
+            margin-top: 70px;
+            padding:0;
+            }
+        .intro-paragraph {
+            width: 100%;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            background-color: rgb(211, 211, 211);
+            color: black;
+            text-align = center;
+            }
+        .first-sentence-intro {
+            color: black;
+            font-size = 30px;
+            text-align: center;
+            }
+        .second-sentence-intro {
+            font-size = 20px;
+            text-align: center;
+            }
+        a {
+            text-decoration-line: none;
+            }
